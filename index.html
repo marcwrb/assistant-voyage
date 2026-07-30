@@ -1,0 +1,1553 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Assistant Voyage</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#f4f5f7;
+}
+
+header{
+    background:linear-gradient(
+    90deg,
+    #e4f12d,
+    #3bd4df
+    );
+    color:white;
+    text-align:center;
+    padding:15px;
+}
+
+.container{
+    max-width:900px;
+    margin:auto;
+    padding:15px;
+}
+
+.card{
+    background:white;
+    border-radius:12px;
+    padding:15px;
+    margin-bottom:15px;
+    box-shadow:0 2px 5px rgba(0,0,0,0.1);
+}
+
+h2{
+    margin-top:0;
+}
+
+input,
+select{
+    width:100%;
+    padding:10px;
+    border:1px solid #ccc;
+    border-radius:8px;
+    margin-top:5px;
+    margin-bottom:10px;
+}
+
+button{
+    padding:12px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.action{
+    width:100%;
+    background:#0078D4;
+    color:white;
+}
+
+.action:hover{
+    background:#005ea6;
+}
+
+.favori{
+    width:100%;
+    margin-bottom:10px;
+    background:#eef6ff;
+    color:#0078D4;
+    border:1px solid #0078D4;
+}
+
+.item{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:8px;
+    border-bottom:1px solid #eee;
+}
+
+.item input[type="checkbox"]{
+    width:18px;
+    height:18px;
+    margin:0;
+    padding:0;
+    flex-shrink:0;
+}
+
+.tabs{
+    display:flex;
+    gap:10px;
+    padding:10px;
+    background:linear-gradient(
+    90deg,
+    #e4f12d,
+    #3bd4df
+    );
+    box-shadow:0 2px 5px rgba(0,0,0,0.1);
+}
+
+.tabs button{
+    flex:1;
+    background:rgba(255,255,255,0.15);
+    color:white;
+    font-size:16px;
+    font-weight:bold;
+    border:1px solid rgba(255,255,255,0.5);
+    border-radius:10px;
+    transition:0.2s;
+}
+
+.tabs button:hover{
+    background:rgba(255,255,255,0.3);
+}
+
+.tabs button.active{
+    background:white;
+    color:#0078D4;
+    border:1px solid white;
+}
+
+#inventaireZone{
+    display:none;
+}
+
+.checkbox-group{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+.checkbox-group label{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    cursor:pointer;
+}
+
+.checkbox-group input[type="checkbox"]{
+    width:18px;
+    height:18px;
+    margin:0;
+    padding:0;
+    flex-shrink:0;
+}
+
+h3{
+    color:#0078D4;
+}
+label{
+    cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>🧳 Assistant Voyage ☀️</h1>
+</header>
+
+<div class="tabs">
+
+<button
+id="btnVoyage"
+onclick="ouvrirOnglet('voyageZone')">
+🧳 Voyage
+</button>
+
+<button
+id="btnInventaire"
+onclick="ouvrirOnglet('inventaireZone')">
+📦 Inventaire
+</button>
+
+</div>
+
+<div class="container">
+
+<div id="voyageZone">
+
+<div class="card">
+
+<h2>⭐ Mes favoris</h2>
+
+<div id="favorisListe"></div>
+
+<hr>
+
+<input
+id="nomFavori"
+placeholder="Nom du favori">
+
+<button
+class="action"
+onclick="sauvegarderFavori()">
+⭐ Sauvegarder ce voyage
+</button>
+
+</div>
+
+<div class="card">
+
+<h2>🧳 Préparer un voyage</h2>
+
+<label>📍 Où allez-vous ?</label>
+<input id="destination" placeholder="Ex : Vosges, Bretagne...">
+
+<label>📅 Combien de jours ?</label>
+<input id="jours" type="number" value="3">
+
+<label>👶 Iris participe ?</label>
+<select id="iris">
+<option value="oui">Oui</option>
+<option value="non">Non</option>
+</select>
+
+<label>🏕️ Type de voyage</label>
+<select id="typeVoyage">
+<option>Week-end famille</option>
+<option>Plage</option>
+<option>Montagne</option>
+<option>Ski</option>
+<option>Camping</option>
+<option>Travail</option>
+</select>
+
+<h3>🎯 Activités prévues</h3>
+
+<div class="checkbox-group">
+
+<label><input type="checkbox"> Piscine</label>
+<label><input type="checkbox"> Randonnée</label>
+<label><input type="checkbox"> Vélo</label>
+<label><input type="checkbox"> Surf</label>
+<label><input type="checkbox"> Plage</label>
+<label><input type="checkbox"> Course à pied</label>
+
+</div>
+
+<br>
+
+<button class="action" onclick="genererListe()">
+🚀 Générer ma checklist
+</button>
+
+<br><br>
+
+<button
+class="action"
+onclick="partagerChecklist()">
+📲 Partager la checklist
+</button>
+
+</div>
+
+<div class="card">
+
+<h2>✅ Liste générée</h2>
+
+<div id="resultat">
+<p>Clique sur <b>Générer ma checklist</b>.</p>
+</div>
+
+</div>
+
+</div>
+
+<div id="inventaireZone" style="display:none;">
+
+<div class="card">
+
+<hr>
+
+<h2>➕ Nouvelle catégorie</h2>
+
+<input
+id="nouvelleCategorie"
+placeholder="Ex : 🏊 Piscine">
+
+<button
+class="action"
+onclick="ajouterCategorie()">
+Créer la catégorie
+</button>
+
+<h2>➕ Ajouter un objet</h2>
+
+<label>Nom de l'objet</label>
+
+<input
+id="nomObjet"
+placeholder="Ex : Brassards Iris">
+
+<label>Catégorie</label>
+
+<select id="categorieObjet">
+</select>
+
+<button
+class="action"
+onclick="ajouterObjet()">
+Ajouter
+</button>    
+
+<button
+class="action"
+onclick="synchroniserInventaire()">
+🔄 Synchroniser avec le code
+</button>
+
+<br><br>
+
+<h2>📦 Inventaire complet</h2>
+
+<button
+class="action"
+onclick="exporterInventaire()">
+💾 Exporter l'inventaire
+</button>
+
+<br><br>
+
+<input
+type="file"
+id="importInventaire"
+accept=".json"
+onchange="importerInventaire(event)">
+
+<br><br>
+
+<div id="inventaireListe"></div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+const inventaireDefaut = {
+
+"👶 Iris - Route":[
+"Change rapide",
+"Tapis à langer portable",
+"Couches",
+"Lingettes",
+"Crème change",
+"Coton",
+"Eau",
+"Body secours",
+"Tenue complète secours",
+"Biberon prêt",
+"Chauffe biberon nomade",
+"Bavoir",
+"Cuillère",
+"Repas complet",
+"Doudou",
+"Jouet de dentition",
+"Jouet pour la route",
+"Lange"
+],
+
+"👶 Iris - Affaires":[
+"Gant de toilette",
+"Jouets",
+"Porte bébé",
+"Siège nomade",
+],
+
+"👶 Iris - Habits":[
+"Bodys",
+"Tenues",
+"Pyjamas",
+"Chaussettes",
+"Collants",
+"Bonnets",
+"Chapeau",
+"Bavoirs",
+"Langes"
+],
+
+"🛏️ Iris - Sommeil":[
+"Alèse lit bébé",
+"Gigoteuse",
+"Drap lit parapluie",
+"Veilleuse baleine",
+"Lit parapluie",
+"Babyphone + chargeur",
+"Doudou Lapainet",
+"Livre dodo"
+],
+
+"🍼 Iris - Repas":[
+"Biberons",
+"Goupillon",
+"Bavoir",
+"Gourde Tum Tum",
+"Cuillère",
+"Bol bébé",
+"Assiette bébé",
+"Petits pots",
+"Compotes",
+"Lait en poudre"
+],
+
+"💊 Iris - Santé":[
+"Pediakid",
+"Seringue lavage nez",
+"Mouchoirs",
+"Sérum physiologique",
+"Thermomètre",
+"Mouche nez",
+"Thermomètre bain",
+"Camilia",
+"Doliprane",
+"Carnet de santé"
+],
+
+"🚼 Iris - Sorties":[
+"Poussette",
+"Porte bébé",
+"Tapis de vie",
+"Bob",
+"Crème solaire",
+"Lunettes de soleil",
+"Tente anti UV"
+],
+
+"👨 Adultes":[
+"Téléphone",
+"Chargeur téléphone",
+"Batterie externe",
+"Carte identité",
+"Permis",
+"Carte bancaire",
+"Clés",
+"Lunettes de soleil",
+"Jeux de sociétés",
+"Sous-vêtements",
+"Chaussettes",
+"T-shirts",
+"Pull",
+"Pantalon",
+"Pyjama"
+],
+
+"🚿 Toilette Adultes":[
+"Trousse à pharmacie",
+"Brosse à dents",
+"Dentifrice",
+"Déodorant",
+"Gel douche",
+"Shampoing",
+"Coupe ongles",
+"Rasoir"
+],
+
+"🏠 Avant départ":[
+"Téléphone Aurore",
+"Prendre les papiers",
+"Prendre les chargeurs",
+"Fenêtres fermées",
+"Poubelles sorties",
+"Plantes arrosées",
+"Maya nourri",
+]
+
+};
+
+let inventaire =
+JSON.parse(
+localStorage.getItem("inventaire")
+)
+||
+JSON.parse(
+JSON.stringify(inventaireDefaut)
+);
+
+let favoris =
+JSON.parse(
+localStorage.getItem("favoris")
+)
+||
+{
+
+"🏠 Week-end PLV":{
+    destination:"PLV",
+    jours:3,
+    iris:"oui",
+    typeVoyage:"Week-end famille",
+    activites:[]
+},
+
+"⛰️ Week-end Vosges":{
+    destination:"Vosges",
+    jours:3,
+    iris:"oui",
+    typeVoyage:"Montagne",
+    activites:["Randonnée"]
+},
+
+"👨‍👩‍👧 Chez les copains":{
+    destination:"Chez les copains",
+    jours:2,
+    iris:"oui",
+    typeVoyage:"Week-end famille",
+    activites:["Piscine"]
+}
+
+};
+
+const typesVoyage = {
+
+"Ski":[
+"Pantalon de ski",
+"Veste de ski",
+"Moufles + gants",
+"Chaussettes chaudes",
+"Bonnet",
+"Après-ski",
+"Ski Marc",
+"Ski Aurore",
+"Chaussures ski Marc",
+"Chaussures ski Aurore",
+"Snow Marc",
+"Snow Aurore",
+"Boots snow Marc",
+"Boots snow Aurore",
+"Masque ski",
+"Tour de cou",
+],
+
+"Montagne":[
+"Veste imperméable",
+"Chaussures randonnée",
+"Sac à dos randonnée"
+],
+
+"Camping":[
+"Tente",
+"Sac de couchage",
+"Lampe",
+"Chargeur nomade"
+],
+
+"Plage":[
+"Parasol",
+"Serviette plage",
+"Crème solaire"
+],
+
+"Travail":[
+"Ordinateur portable",
+"Chargeur PC",
+"Bloc-notes",
+"Stylos"
+]
+
+};
+
+const activites = {
+
+"Piscine":[
+"Maillot de bain",
+"Serviette",
+"Claquettes"
+],
+
+"Randonnée":[
+"Chaussures randonnée",
+"Gourde",
+"Sac à dos randonnée"
+],
+
+"Vélo":[
+"Casque",
+"Antivol",
+"Pompe"
+],
+
+"Surf":[
+"Combinaison surf",
+"Planches de surf",
+"Wax",
+"Dérives surf",
+"Bob surf",
+"Crème solaire",
+"Ponchos surf"
+],
+
+"Plage":[
+"Casquette",
+"Lunettes de soleil",
+"Parasol",
+"Fouta",
+"Serviette plage"
+],
+
+"Course à pied":[
+"Chaussures trail",
+"Chaussures route",
+"Tee-shirt de course",
+"Short de course",
+"Chaussettes de course",
+"Casquette",
+"Gilet + flasques",
+"Gel",
+"Casque musique + chargeur"
+],
+
+};
+
+function afficherInventaire(){
+
+let html = "";
+
+for(const section in inventaire){
+
+html += `
+<h3>
+
+${section}
+
+<button
+onclick="
+supprimerCategorie(
+'${section}'
+)
+">
+🗑️
+</button>
+
+</h3>
+`;
+
+inventaire[section].forEach(
+(item,index)=>{
+
+
+html += `
+<div class="item">
+
+${item}
+
+<button
+onclick="
+modifierObjet(
+'${section}',
+${index}
+)
+">
+✏️
+</button>
+
+<button
+onclick="
+supprimerObjet(
+'${section}',
+${index}
+)
+">
+❌
+</button>
+
+</div>
+`;
+
+});
+
+}
+
+document.getElementById("inventaireListe").innerHTML = html;
+
+}
+
+function genererListe(){
+
+let html = "";
+
+const iris =
+document.getElementById("iris").value;
+
+const typeVoyage =
+document.getElementById("typeVoyage").value;
+
+const jours =
+parseInt(
+document.getElementById("jours").value
+) || 1;
+
+// =======================
+// QUANTITES ADULTES
+// =======================
+
+html += `
+<div class="card">
+<h3>👨 Adultes - Vêtements</h3>
+
+<label class="item">
+<input type="checkbox">
+${jours + 1} sous-vêtements
+</label>
+
+<label class="item">
+<input type="checkbox">
+${jours + 1} paires de chaussettes
+</label>
+
+<label class="item">
+<input type="checkbox">
+${jours + 1} t-shirts
+</label>
+
+<label class="item">
+<input type="checkbox">
+${Math.ceil(jours / 2)} pyjamas
+</label>
+
+</div>
+`;
+
+// =======================
+// QUANTITES IRIS
+// =======================
+
+if(iris === "oui"){
+
+html += `
+<div class="card">
+
+<h3>👶 Iris - Habits</h3>
+
+<label class="item">
+<input type="checkbox">
+${jours + 2} bodys
+</label>
+
+<label class="item">
+<input type="checkbox">
+${jours + 2} tenues
+</label>
+
+<label class="item">
+<input type="checkbox">
+${Math.ceil(jours / 2) + 1} pyjamas
+</label>
+
+<label class="item">
+<input type="checkbox">
+${jours * 4} couches
+</label>
+
+</div>
+`;
+}
+
+// =======================
+// INVENTAIRE DE BASE
+// =======================
+
+for(const section in inventaire){
+
+if(
+iris === "non" &&
+section.includes("Iris")
+){
+continue;
+}
+
+// on évite les doublons
+if(
+section === "👶 Iris - Habits"
+){
+continue;
+}
+
+if(
+section === "👨 Adultes"
+){
+continue;
+}
+
+html += `<div class="card">
+<h3>${section}</h3>`;
+
+inventaire[section].forEach(
+(item,index)=>{
+
+
+html += `
+<label class="item">
+<input type="checkbox">
+${item}
+</label>
+`;
+
+});
+
+html += `</div>`;
+
+}
+
+// =======================
+// TYPE DE VOYAGE
+// =======================
+
+if(typesVoyage[typeVoyage]){
+
+html += `
+<div class="card">
+
+<h3>🏕️ ${typeVoyage}</h3>
+`;
+
+typesVoyage[typeVoyage].forEach(item=>{
+
+html += `
+<label class="item">
+<input type="checkbox">
+${item}
+</label>
+`;
+
+});
+
+html += `
+</div>
+`;
+
+}
+
+// =======================
+// ACTIVITES
+// =======================
+
+document
+.querySelectorAll(
+".checkbox-group input[type='checkbox']"
+)
+.forEach(cb=>{
+
+if(!cb.checked) return;
+
+const nom =
+cb.parentElement.textContent.trim();
+
+if(!activites[nom]) return;
+
+html += `
+<div class="card">
+
+<h3>🎯 ${nom}</h3>
+`;
+
+activites[nom].forEach(item=>{
+
+html += `
+<label class="item">
+<input type="checkbox">
+${item}
+</label>
+`;
+
+});
+
+html += `
+</div>
+`;
+
+});
+
+// =======================
+
+document.getElementById(
+"resultat"
+).innerHTML = html;
+
+}
+
+function chargerFavori(type){
+
+if(type==="plv"){
+document.getElementById("jours").value=2;
+document.getElementById("typeVoyage").value="Week-end famille";
+}
+
+if(type==="vosges"){
+document.getElementById("jours").value=3;
+document.getElementById("typeVoyage").value="Montagne";
+}
+
+if(type==="copains"){
+document.getElementById("jours").value=2;
+document.getElementById("typeVoyage").value="Week-end famille";
+}
+
+genererListe();
+
+}
+
+function ouvrirOnglet(id){
+
+    document.getElementById(
+        "voyageZone"
+    ).style.display = "none";
+
+    document.getElementById(
+        "inventaireZone"
+    ).style.display = "none";
+
+    document.getElementById(
+        id
+    ).style.display = "block";
+
+    document
+    .querySelectorAll(".tabs button")
+    .forEach(btn=>{
+
+        btn.classList.remove("active");
+
+    });
+
+    if(id === "voyageZone"){
+
+        document
+        .getElementById("btnVoyage")
+        .classList.add("active");
+
+    }else{
+
+        document
+        .getElementById("btnInventaire")
+        .classList.add("active");
+
+    }
+
+}
+
+function sauvegarderInventaire(){
+
+    localStorage.setItem(
+        "inventaire",
+        JSON.stringify(inventaire)
+    );
+
+}
+
+function ajouterObjet(){
+
+    const nom =
+    document
+    .getElementById("nomObjet")
+    .value
+    .trim();
+
+    const categorie =
+    document
+    .getElementById("categorieObjet")
+    .value;
+
+    if(!nom) return;
+
+    inventaire[categorie].push(nom);
+
+    sauvegarderInventaire();
+
+    afficherInventaire();
+
+    document
+    .getElementById("nomObjet")
+    .value = "";
+
+}
+
+function modifierObjet(
+    categorie,
+    index
+){
+
+    const nouveauNom =
+    prompt(
+        "Modifier l'objet",
+        inventaire[categorie][index]
+    );
+
+    if(!nouveauNom){
+        return;
+    }
+
+    inventaire[categorie][index] =
+    nouveauNom;
+
+    sauvegarderInventaire();
+
+    afficherInventaire();
+
+}
+
+function supprimerObjet(
+    categorie,
+    index
+){
+
+    if(
+        !confirm(
+            "Supprimer cet objet ?"
+        )
+    ){
+        return;
+    }
+
+    inventaire[categorie]
+    .splice(index,1);
+
+    sauvegarderInventaire();
+
+    afficherInventaire();
+
+}
+
+
+function remplirListeCategories(){
+
+    const select =
+    document.getElementById(
+        "categorieObjet"
+    );
+
+    if(!select) return;
+
+    select.innerHTML = "";
+
+    Object.keys(inventaire)
+    .forEach(categorie=>{
+
+        select.innerHTML += `
+        <option>
+        ${categorie}
+        </option>
+        `;
+
+    });
+
+}
+
+function ajouterCategorie(){
+
+    const nouvelleCategorie =
+    document
+    .getElementById(
+        "nouvelleCategorie"
+    )
+    .value
+    .trim();
+
+    if(!nouvelleCategorie){
+        return;
+    }
+
+    if(
+        inventaire[nouvelleCategorie]
+    ){
+        alert(
+        "Cette catégorie existe déjà"
+        );
+        return;
+    }
+
+    inventaire[
+        nouvelleCategorie
+    ] = [];
+
+    sauvegarderInventaire();
+
+    remplirListeCategories();
+
+    afficherInventaire();
+
+    document
+    .getElementById(
+        "nouvelleCategorie"
+    )
+    .value = "";
+
+}
+
+function supprimerCategorie(
+categorie
+){
+
+    if(
+        inventaire[categorie]
+        .length > 0
+    ){
+
+        alert(
+        "La catégorie doit être vide"
+        );
+
+        return;
+    }
+
+    delete inventaire[categorie];
+
+    sauvegarderInventaire();
+
+    remplirListeCategories();
+
+    afficherInventaire();
+
+}
+
+function exporterInventaire(){
+
+    const contenu =
+    JSON.stringify(
+        inventaire,
+        null,
+        2
+    );
+
+    const blob =
+    new Blob(
+        [contenu],
+        {
+            type:"application/json"
+        }
+    );
+
+    const url =
+    URL.createObjectURL(blob);
+
+    const lien =
+    document.createElement("a");
+
+    lien.href = url;
+
+    lien.download =
+    "inventaire.json";
+
+    lien.click();
+
+    URL.revokeObjectURL(url);
+
+}
+
+function importerInventaire(event){
+
+    const fichier =
+    event.target.files[0];
+
+    if(!fichier){
+        return;
+    }
+
+    const lecteur =
+    new FileReader();
+
+    lecteur.onload =
+    function(e){
+
+        try{
+
+            inventaire =
+            JSON.parse(
+                e.target.result
+            );
+
+            sauvegarderInventaire();
+
+            remplirListeCategories();
+
+            afficherInventaire();
+
+            alert(
+            "Inventaire importé avec succès ✅"
+            );
+
+        }
+        catch{
+
+            alert(
+            "Fichier invalide ❌"
+            );
+
+        }
+
+    };
+
+    lecteur.readAsText(
+        fichier
+    );
+
+}
+
+function sauvegarderFavoris(){
+
+    localStorage.setItem(
+        "favoris",
+        JSON.stringify(favoris)
+    );
+
+}
+
+function sauvegarderFavori(){
+
+    const nom =
+    document.getElementById(
+        "nomFavori"
+    ).value.trim();
+
+    if(!nom){
+        alert("Nom obligatoire");
+        return;
+    }
+
+    const activitesSelectionnees = [];
+
+    document
+    .querySelectorAll(
+        ".checkbox-group input[type='checkbox']"
+    )
+    .forEach(cb=>{
+
+        if(cb.checked){
+
+            activitesSelectionnees.push(
+                cb.parentElement
+                .textContent
+                .trim()
+            );
+
+        }
+
+    });
+
+    favoris[nom] = {
+
+        destination:
+        document.getElementById(
+            "destination"
+        ).value,
+
+        jours:
+        document.getElementById(
+            "jours"
+        ).value,
+
+        iris:
+        document.getElementById(
+            "iris"
+        ).value,
+
+        typeVoyage:
+        document.getElementById(
+            "typeVoyage"
+        ).value,
+
+        activites:
+        activitesSelectionnees
+
+    };
+
+    sauvegarderFavoris();
+
+    afficherFavoris();
+
+    alert(
+    "Favori enregistré ✅"
+    );
+
+}
+
+function afficherFavoris(){
+
+    let html = "";
+
+    for(const nom in favoris){
+
+        html += `
+
+        <div
+        style="
+        display:flex;
+        gap:10px;
+        margin-bottom:10px;
+        ">
+
+            <button
+            class="favori"
+            style="flex:1"
+            onclick="
+            chargerFavoriPerso(
+            '${nom}'
+            )
+            ">
+            ⭐ ${nom}
+            </button>
+
+            <button
+            onclick="
+            supprimerFavori(
+            '${nom}'
+            )
+            ">
+            ❌
+            </button>
+
+        </div>
+
+        `;
+    }
+
+    document.getElementById(
+        "favorisListe"
+    ).innerHTML = html;
+
+}
+
+function chargerFavoriPerso(nom){
+
+    const favori =
+    favoris[nom];
+
+    document
+    .getElementById(
+        "destination"
+    ).value =
+    favori.destination;
+
+    document
+    .getElementById(
+        "jours"
+    ).value =
+    favori.jours;
+
+    document
+    .getElementById(
+        "iris"
+    ).value =
+    favori.iris;
+
+    document
+    .getElementById(
+        "typeVoyage"
+    ).value =
+    favori.typeVoyage;
+
+    document
+    .querySelectorAll(
+        ".checkbox-group input[type='checkbox']"
+    )
+    .forEach(cb=>{
+
+        const nomActivite =
+        cb.parentElement
+        .textContent
+        .trim();
+
+        cb.checked =
+        favori.activites.includes(
+            nomActivite
+        );
+
+    });
+
+    genererListe();
+
+}
+
+function supprimerFavori(nom){
+
+    if(
+        !confirm(
+        "Supprimer le favori ?"
+        )
+    ){
+        return;
+    }
+
+    delete favoris[nom];
+
+    sauvegarderFavoris();
+
+    afficherFavoris();
+
+}
+
+function synchroniserInventaire(){
+
+    if(
+        !confirm(
+            "Mettre à jour l'inventaire avec le contenu du code ?"
+        )
+    ){
+        return;
+    }
+
+    for(const categorie in inventaireDefaut){
+
+        if(!inventaire[categorie]){
+
+            inventaire[categorie] =
+            [...inventaireDefaut[categorie]];
+
+        }
+        else{
+
+            inventaireDefaut[categorie]
+            .forEach(item=>{
+
+                if(
+                    !inventaire[categorie]
+                    .includes(item)
+                ){
+
+                    inventaire[categorie]
+                    .push(item);
+
+                }
+
+            });
+
+        }
+
+    }
+
+    sauvegarderInventaire();
+
+    remplirListeCategories();
+
+    afficherInventaire();
+
+    alert(
+        "Inventaire synchronisé ✅"
+    );
+
+}
+
+async function partagerChecklist(){
+
+    let texte = "";
+
+    document
+    .querySelectorAll("#resultat .card")
+    .forEach(carte=>{
+
+        const titre =
+        carte.querySelector("h3");
+
+        if(titre){
+
+            texte += "\n";
+            texte += titre.textContent;
+            texte += "\n";
+
+        }
+
+        carte
+        .querySelectorAll(".item")
+        .forEach(item=>{
+
+            texte +=
+            "☐ " +
+            item.textContent.trim()
+            + "\n";
+
+        });
+
+    });
+
+    if(
+        navigator.share
+    ){
+
+        try{
+
+await navigator.share({
+
+    title:
+    "Checklist - " +
+    document.getElementById(
+    "destination"
+    ).value,
+
+    text:
+    "Destination : " +
+    document.getElementById(
+    "destination"
+    ).value +
+    "\n\n" +
+    texte
+
+});
+
+        }
+        catch(err){
+
+            console.log(err);
+
+        }
+
+    }else{
+
+        navigator.clipboard
+        .writeText(texte);
+
+        alert(
+        "Partage non supporté.\nChecklist copiée dans le presse-papiers ✅"
+        );
+
+    }
+
+}
+
+if ('serviceWorker' in navigator) {
+
+    window.addEventListener('load', () => {
+
+        navigator.serviceWorker
+        .register('sw.js');
+
+    });
+
+}
+
+remplirListeCategories();
+afficherInventaire();
+afficherFavoris();
+
+ouvrirOnglet("voyageZone");
+
+</script>
+
+</body>
+</html>
