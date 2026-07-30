@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Assistant Voyage</title>
+<title>🧳 Prêt à Partir ☀️</title>
 
 <style>
 
@@ -163,6 +163,106 @@ h3{
 label{
     cursor:pointer;
 }
+
+.form-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:15px;
+}
+
+@media(max-width:700px){
+    .form-row{
+        grid-template-columns:1fr;
+    }
+}
+
+.participants-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:10px;
+    margin-bottom:25px;
+}
+
+
+.participant-card{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:12px;
+    border:1px solid #ddd;
+    border-radius:10px;
+    background:white;
+}
+
+.participant-card:hover{
+    background:#f8f9fa;
+}
+
+.participant-card input{
+    width:20px;
+    height:20px;
+    margin:0;
+}
+
+.activites-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+    margin-top:10px;
+}
+
+.activites-grid label{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:10px;
+    border:1px solid #ddd;
+    border-radius:10px;
+    background:white;
+    cursor:pointer;
+}
+
+.activites-grid label:hover{
+    background:#f8f9fa;
+}
+
+.activites-grid input{
+    width:18px;
+    height:18px;
+    margin:0;
+    flex-shrink:0;
+}
+
+.section-title{
+    color:#0078D4;
+    margin-top:30px;
+    margin-bottom:15px;
+}
+
+
+.btn-generate{
+    background:#28a745;
+    color:white;
+    font-size:18px;
+    font-weight:bold;
+}
+
+.btn-generate:hover{
+    background:#208638;
+}
+
+.favoris-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+}
+
+@media(max-width:700px){
+    .favoris-grid{
+        grid-template-columns:1fr;
+    }
+}
+
 </style>
 
 <link rel="manifest" href="manifest.json">
@@ -175,14 +275,14 @@ label{
 
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
-<meta name="apple-mobile-web-app-title" content="Assistant Voyage">
+<meta name="apple-mobile-web-app-title" content="🧳 Prêt à Partir ☀️">
 
 </head>
 
 <body>
 
 <header>
-<h1>🧳 Assistant Voyage ☀️</h1>
+<h1>🧳 Prêt à Partir ☀️</h1>
 </header>
 
 <div class="tabs">
@@ -255,40 +355,145 @@ oninput="gererMachineALaver()">
 
 </div>
 
-<label>👶 Iris participe ?</label>
-<select id="iris">
-<option value="oui">Oui</option>
-<option value="non">Non</option>
-</select>
+<h3 class="section-title">
+👨‍👩‍👧 Participants
+</h3>
+
+<div class="participants-grid">
+
+<label class="participant-card">
+<input
+type="checkbox"
+id="participantAurore"
+checked>
+👩 Aurore
+</label>
+
+<label class="participant-card">
+<input
+type="checkbox"
+id="participantMarc"
+checked>
+👨 Marc
+</label>
+
+<label class="participant-card">
+<input
+type="checkbox"
+id="participantIris"
+checked>
+👶 Iris
+</label>
+
+<label class="participant-card">
+<input
+type="checkbox"
+id="participantMaya">
+🐱 Maya
+</label>
+
+</div>
+
+<div class="form-row">
+
+<div>
 
 <label>🏕️ Type de voyage</label>
+
 <select id="typeVoyage">
-<option>Week-end famille</option>
-<option>Plage</option>
-<option>Montagne</option>
-<option>Ski</option>
-<option>Camping</option>
-<option>Travail</option>
+    <option>Week-end famille</option>
+    <option>Plage</option>
+    <option>Montagne</option>
+    <option>Ski</option>
+    <option>Camping</option>
+    <option>Travail</option>
 </select>
 
-<h3>🎯 Activités prévues</h3>
+</div>
 
-<div class="checkbox-group">
+<div>
 
-<label><input type="checkbox"> Piscine</label>
-<label><input type="checkbox"> Randonnée</label>
-<label><input type="checkbox"> Vélo</label>
-<label><input type="checkbox"> Surf</label>
-<label><input type="checkbox"> Plage</label>
-<label><input type="checkbox"> Course à pied</label>
+<label>🌡️ Météo prévue</label>
+
+<select id="meteo">
+    <option value="tempere">Tempérée</option>
+    <option value="chaud">Chaud</option>
+    <option value="froid">Froid</option>
+</select>
+
+</div>
+
+</div>
+
+
+<h3 class="section-title">
+🎯 Activités prévues
+</h3>
+
+<div
+id="activitesZone"
+class="activites-grid">
+
+<label>
+<input
+type="checkbox"
+onchange="sauvegarderEtatChecklist()">
+Piscine
+</label>
+
+<label>
+<input
+type="checkbox"
+onchange="sauvegarderEtatChecklist()">
+Randonnée
+</label>
+
+<label>
+<input
+type="checkbox"
+onchange="sauvegarderEtatChecklist()">
+Vélo
+</label>
+
+<label>
+<input
+type="checkbox"
+onchange="sauvegarderEtatChecklist()">
+Surf
+</label>
+
+<label>
+<input
+type="checkbox"
+onchange="sauvegarderEtatChecklist()">
+Plage
+</label>
+
+<label>
+<input
+type="checkbox"
+onchange="sauvegarderEtatChecklist()">
+Course à pied
+</label>
 
 </div>
 
 <br>
 
-<button class="action" onclick="genererListe()">
+<button
+class="action btn-generate"
+onclick="genererListe()">
 🚀 Générer ma checklist
 </button>
+
+<br><br>
+
+<button
+class="action"
+onclick="reinitialiserChecklist()">
+♻️ Remettre le voyage à zéro
+</button>
+
 
 <br><br>
 
@@ -495,6 +700,12 @@ onclick="synchroniserInventaire()">
 🔄 Synchroniser avec le code
 </button>
 
+<button
+class="action"
+onclick="reinitialiserInventaire()">
+♻️ Réinitialiser depuis le code
+</button>
+
 <br><br>
 
 <h2>📦 Inventaire complet</h2>
@@ -616,44 +827,71 @@ const inventaireDefaut = {
 "Tente anti UV"
 ],
 
-"👨 Adultes":[
+"🎒 Commun":[
 "Téléphone",
 "Chargeur téléphone",
 "Batterie externe",
 "Carte identité",
 "Permis",
 "Carte bancaire",
+"Trousse à pharmacie",
 "Clés",
 "Lunettes de soleil",
-"Jeux de sociétés",
+"Jeux de sociétés"
+],
+
+"👩 Aurore":[
 "Sous-vêtements",
 "Chaussettes",
 "T-shirts",
 "Pull",
 "Pantalon",
-"Pyjama"
+"Pyjama",
+"Trousse de toilette",
+"Brosse à cheveux",
+"Gourde eau",
+"Maquillage"
 ],
 
-"🚿 Toilette Adultes":[
-"Trousse à pharmacie",
-"Brosse à dents",
-"Dentifrice",
-"Déodorant",
-"Gel douche",
-"Shampoing",
+"👨 Marc":[
+"Sous-vêtements",
+"Chaussettes",
+"T-shirts",
+"Pull",
+"Pantalon",
+"Pyjama",
+"Montre",
+"Trousse de toilette",
 "Coupe ongles",
-"Rasoir"
+"Airpod",
+"Lunettes",
+"Casquette",
+"Livre"
 ],
 
-"🏠 Avant départ":[
-"Téléphone Aurore",
-"Prendre les papiers",
-"Prendre les chargeurs",
-"Fenêtres fermées",
-"Poubelles sorties",
-"Plantes arrosées",
-"Maya nourri",
+"🐱 Maya":[
+"Croquettes",
+"Pâtée",
+"Gamelles",
+"Carnet vétérinaire",
+"Caisse de transport"
+],
+
+"🚗 Avant départ":[
+"Vider les poubelles",
+"Nourrir Maya",
+"Fermer les fenêtres",
+"Fermer les volets",
+"Couper les lumières",
+"Brancher l'alarme",
+"Prendre les clés du logement",
+"Vider le lave-vaisselle",
+"Vider le frigo des produits périssables",
+"Nourriture pour la route",
+"Remplir les gourdes",
+"Vérifier les biberons et repas d'Iris"
 ]
+
 
 };
 
@@ -676,7 +914,9 @@ localStorage.getItem("favoris")
 "🏠 Week-end PLV":{
     destination:"PLV",
     jours:3,
-    iris:"oui",
+    participantAurore:true,
+    participantMarc:true,
+    participantIris:true,
     typeVoyage:"Week-end famille",
     activites:[]
 },
@@ -684,7 +924,9 @@ localStorage.getItem("favoris")
 "⛰️ Week-end Vosges":{
     destination:"Vosges",
     jours:3,
-    iris:"oui",
+    participantAurore:true,
+    participantMarc:true,
+    participantIris:true,
     typeVoyage:"Montagne",
     activites:["Randonnée"]
 },
@@ -692,7 +934,9 @@ localStorage.getItem("favoris")
 "👨‍👩‍👧 Chez les copains":{
     destination:"Chez les copains",
     jours:2,
-    iris:"oui",
+    participantAurore:true,
+    participantMarc:true,
+    participantIris:true,
     typeVoyage:"Week-end famille",
     activites:["Piscine"]
 }
@@ -964,10 +1208,54 @@ document.getElementById("inventaireListe").innerHTML = html;
 
 function genererListe(){
 
+const checklistExistante =
+localStorage.getItem(
+    "checklistHTML"
+);
+
+if(checklistExistante){
+
+    const continuer =
+    confirm(
+        "Une checklist existe déjà.\n\nLa régénération supprimera votre progression.\n\nContinuer ?"
+    );
+
+    if(!continuer){
+        return;
+    }
+
+    localStorage.removeItem(
+        "checklistEtat"
+    );
+
+
+}
+
 let html = "";
 
 const iris =
-document.getElementById("iris").value;
+document.getElementById(
+    "participantIris"
+).checked;
+
+const maya =
+document.getElementById(
+    "participantMaya"
+).checked;
+
+const aurore =
+document.getElementById(
+    "participantAurore"
+).checked;
+
+const marc =
+document.getElementById(
+    "participantMarc"
+).checked;
+
+
+const meteo =
+document.getElementById("meteo").value;
 
 const typeVoyage =
 document.getElementById("typeVoyage").value;
@@ -1003,6 +1291,23 @@ const nbVetementsAdultes =
 )
 ? 10
 : jours + 1;
+let nbPulls = 1;
+let nbPantalons = 1;
+
+if(jours > 3){
+    nbPulls = 2;
+    nbPantalons = 2;
+}
+
+if(jours > 7){
+    nbPulls = 3;
+    nbPantalons = 3;
+}
+
+if(meteo === "chaud"){
+    nbPulls = 1;
+}
+
 const nbVetementsIris =
 (
     jours > 10 &&
@@ -1015,7 +1320,7 @@ const nbVetementsIris =
 // QUANTITES IRIS
 // =======================
 
-if(iris === "oui"){
+if(iris){
 
 html += `
 <div class="card">
@@ -1023,22 +1328,30 @@ html += `
 <h3>👶 Iris - Habits</h3>
 
 <label class="item">
-<input type="checkbox">
+<input
+type="checkbox"
+onchange="sauvegarderEtatChecklist()">
 ${nbVetementsIris} bodys
 </label>
 
 <label class="item">
-<input type="checkbox">
+<input
+type="checkbox"
+onchange="sauvegarderEtatChecklist()">
 ${nbVetementsIris} tenues
 </label>
 
 <label class="item">
-<input type="checkbox">
+<input
+type="checkbox"
+onchange="sauvegarderEtatChecklist()">
 ${nbPyjamasIris} pyjamas
 </label>
 
 <label class="item">
-<input type="checkbox">
+<input
+type="checkbox"
+onchange="sauvegarderEtatChecklist()">
 ${jours * 4} couches
 </label>
 
@@ -1053,10 +1366,31 @@ ${jours * 4} couches
 for(const section in inventaire){
 
 if(
-iris === "non" &&
+!iris &&
 section.includes("Iris")
 ){
-continue;
+    continue;
+}
+
+if(
+    !maya &&
+    section === "🐱 Maya"
+){
+    continue;
+}
+
+if(
+    !marc &&
+    section === "👨 Marc"
+){
+    continue;
+}
+
+if(
+    !aurore &&
+    section === "👩 Aurore"
+){
+    continue;
 }
 
 // on évite les doublons
@@ -1066,31 +1400,58 @@ section === "👶 Iris - Habits"
 continue;
 }
 
-if(section === "👨 Adultes"){
+if(
+    section === "👩 Aurore"
+    ||
+    section === "👨 Marc"
+){
 
     html += `
     <div class="card">
-    <h3>👨 Adultes</h3>
+    <h3>${section}</h3>
 
     <label class="item">
-    <input type="checkbox">
+    <input
+type="checkbox"
+onchange="sauvegarderEtatChecklist()">
     ${nbVetementsAdultes} sous-vêtements
     </label>
 
     <label class="item">
-    <input type="checkbox">
+    <input
+type="checkbox"
+onchange="sauvegarderEtatChecklist()">
     ${nbVetementsAdultes} paires de chaussettes
     </label>
 
     <label class="item">
-    <input type="checkbox">
+    <input
+type="checkbox"
+onchange="sauvegarderEtatChecklist()">
     ${nbVetementsAdultes} t-shirts
     </label>
 
     <label class="item">
-    <input type="checkbox">
+    <input
+type="checkbox"
+onchange="sauvegarderEtatChecklist()">
     ${nbPyjamasAdultes} pyjama${nbPyjamasAdultes > 1 ? "s" : ""}
     </label>
+
+<label class="item">
+<input
+type="checkbox"
+onchange="sauvegarderEtatChecklist()">
+${nbPulls} pull${nbPulls > 1 ? "s" : ""}
+</label>
+
+<label class="item">
+<input
+type="checkbox"
+onchange="sauvegarderEtatChecklist()">
+${nbPantalons} pantalon${nbPantalons > 1 ? "s" : ""}
+</label>
+
     `;
 
     inventaire[section].forEach(item=>{
@@ -1101,14 +1462,16 @@ if(section === "👨 Adultes"){
             item === "T-shirts" ||
             item === "Pyjama" ||
             item === "Pull" ||
-            item === "Pantalon"
+item === "Pantalon"
         ){
             return;
         }
 
         html += `
         <label class="item">
-        <input type="checkbox">
+        <input
+type="checkbox"
+onchange="sauvegarderEtatChecklist()">
         ${item}
         </label>
         `;
@@ -1128,7 +1491,9 @@ inventaire[section].forEach(
 
 html += `
 <label class="item">
-<input type="checkbox">
+<input
+type="checkbox"
+onchange="sauvegarderEtatChecklist()">
 ${item}
 </label>
 `;
@@ -1155,7 +1520,9 @@ typesVoyage[typeVoyage].forEach(item=>{
 
 html += `
 <label class="item">
-<input type="checkbox">
+<input
+type="checkbox"
+onchange="sauvegarderEtatChecklist()">
 ${item}
 </label>
 `;
@@ -1195,7 +1562,9 @@ activites[nom].forEach(item=>{
 
 html += `
 <label class="item">
-<input type="checkbox">
+<input
+type="checkbox"
+onchange="sauvegarderEtatChecklist()">
 ${item}
 </label>
 `;
@@ -1213,6 +1582,17 @@ html += `
 document.getElementById(
 "resultat"
 ).innerHTML = html;
+
+localStorage.setItem(
+    "checklistHTML",
+    html
+);
+
+
+localStorage.setItem(
+    "checklistHTML",
+    html
+);
 
 }
 
@@ -1568,10 +1948,10 @@ function sauvegarderFavori(){
     const activitesSelectionnees = [];
 
     document
-    .querySelectorAll(
-        ".checkbox-group input[type='checkbox']"
-    )
-    .forEach(cb=>{
+.querySelectorAll(
+    "#activitesZone input[type='checkbox']"
+)
+.forEach(cb=>{
 
         if(cb.checked){
 
@@ -1597,10 +1977,26 @@ function sauvegarderFavori(){
             "jours"
         ).value,
 
-        iris:
-        document.getElementById(
-            "iris"
-        ).value,
+participantAurore:
+document.getElementById(
+    "participantAurore"
+).checked,
+
+participantMarc:
+document.getElementById(
+    "participantMarc"
+).checked,
+
+participantIris:
+document.getElementById(
+    "participantIris"
+).checked,
+
+participantMaya:
+document.getElementById(
+    "participantMaya"
+).checked,
+
 
         typeVoyage:
         document.getElementById(
@@ -1624,18 +2020,21 @@ function sauvegarderFavori(){
 
 function afficherFavoris(){
 
-    let html = "";
+    let html = '<div class="favoris-grid">';
 
     for(const nom in favoris){
 
         html += `
 
         <div
-        style="
-        display:flex;
-        gap:10px;
-        margin-bottom:10px;
-        ">
+style="
+display:flex;
+gap:8px;
+padding:8px;
+border:1px solid #ddd;
+border-radius:10px;
+background:white;
+">
 
             <button
             class="favori"
@@ -1661,7 +2060,7 @@ function afficherFavoris(){
 
         `;
     }
-
+html += "</div>";
     document.getElementById(
         "favorisListe"
     ).innerHTML = html;
@@ -1685,11 +2084,29 @@ function chargerFavoriPerso(nom){
     ).value =
     favori.jours;
 
-    document
-    .getElementById(
-        "iris"
-    ).value =
-    favori.iris;
+document
+.getElementById(
+    "participantAurore"
+).checked =
+favori.participantAurore ?? true;
+
+document
+.getElementById(
+    "participantMarc"
+).checked =
+favori.participantMarc ?? true;
+
+document
+.getElementById(
+    "participantIris"
+).checked =
+favori.participantIris ?? true;
+
+document
+.getElementById(
+    "participantMaya"
+).checked =
+favori.participantMaya ?? false;
 
     document
     .getElementById(
@@ -1697,11 +2114,11 @@ function chargerFavoriPerso(nom){
     ).value =
     favori.typeVoyage;
 
-    document
-    .querySelectorAll(
-        ".checkbox-group input[type='checkbox']"
-    )
-    .forEach(cb=>{
+   document
+.querySelectorAll(
+    "#activitesZone input[type='checkbox']"
+)
+.forEach(cb=>{
 
         const nomActivite =
         cb.parentElement
@@ -1885,7 +2302,9 @@ function afficherCourses(){
 
         <label>
 
-<input type="checkbox">
+<input
+type="checkbox"
+onchange="sauvegarderEtatChecklist()">
 
 ${course}
 
@@ -2224,6 +2643,10 @@ function ajouterSelectionRecette(){
 
     afficherCourses();
 
+    document.getElementById(
+        "selectionProduits"
+    ).innerHTML = "";
+
 }
 
 function ajouterTouteRecette(nomRecette){
@@ -2385,10 +2808,215 @@ if(!AFFICHER_COURSES){
 
 }
 
+function reinitialiserInventaire(){
+
+    let suppressions = [];
+
+    // Catégories supprimées du code
+    for(const categorie in inventaire){
+
+        if(!inventaireDefaut[categorie]){
+
+            suppressions.push(
+                "Catégorie : " + categorie
+            );
+
+            continue;
+        }
+
+        // Objets supprimés du code
+        inventaire[categorie]
+        .forEach(item => {
+
+            if(
+                !inventaireDefaut[categorie]
+                .includes(item)
+            ){
+
+                suppressions.push(
+                    categorie +
+                    " > " +
+                    item
+                );
+
+            }
+
+        });
+
+    }
+
+    let message =
+    "L'inventaire va être remis exactement comme dans le code.\n\n";
+
+    if(suppressions.length > 0){
+
+        message +=
+        "Les éléments suivants seront supprimés :\n\n";
+
+        message +=
+        suppressions.join("\n");
+
+    }
+    else{
+
+        message +=
+        "Aucune suppression détectée.";
+
+    }
+
+    message += "\n\nContinuer ?";
+
+    if(!confirm(message)){
+        return;
+    }
+
+    inventaire =
+    JSON.parse(
+        JSON.stringify(inventaireDefaut)
+    );
+
+    sauvegarderInventaire();
+
+    remplirListeCategories();
+
+    afficherInventaire();
+
+    alert(
+        "Inventaire réinitialisé ✅"
+    );
+
+}
+
+function sauvegarderEtatChecklist(){
+
+    const etats = [];
+
+    document
+    .querySelectorAll(
+        "#resultat input[type='checkbox']"
+    )
+    .forEach(cb=>{
+
+        etats.push(cb.checked);
+
+    });
+
+    localStorage.setItem(
+        "checklistEtat",
+        JSON.stringify(etats)
+    );
+
+}
+
+function reinitialiserChecklist(){
+
+    if(
+        !confirm(
+            "Remettre tout le voyage à zéro ?"
+        )
+    ){
+        return;
+    }
+
+    // Suppression stockage
+    localStorage.removeItem(
+        "checklistHTML"
+    );
+
+    localStorage.removeItem(
+        "checklistEtat"
+    );
+
+    // Destination
+    document.getElementById(
+        "destination"
+    ).value = "";
+
+    // Durée
+    document.getElementById(
+        "jours"
+    ).value = 3;
+
+    // Voyage
+    document.getElementById(
+        "typeVoyage"
+    ).value =
+    "Week-end famille";
+
+    // Météo
+    document.getElementById(
+        "meteo"
+    ).value =
+    "tempere";
+
+    // Participants
+    document.getElementById(
+        "participantAurore"
+    ).checked = true;
+
+    document.getElementById(
+        "participantMarc"
+    ).checked = true;
+
+    document.getElementById(
+        "participantIris"
+    ).checked = true;
+
+    document.getElementById(
+        "participantMaya"
+    ).checked = false;
+
+    // Activités
+    document
+    .querySelectorAll(
+        "#activitesZone input[type='checkbox']"
+    )
+    .forEach(cb=>{
+
+        cb.checked = false;
+
+    });
+
+    // Machine à laver
+    document.getElementById(
+        "machineALaver"
+    ).value = "non";
+
+    gererMachineALaver();
+
+document.getElementById(
+    "nomFavori"
+).value = "";
+
+    // Effacement checklist
+    document.getElementById(
+        "resultat"
+    ).innerHTML =
+    "<p>Clique sur <b>Générer ma checklist</b>.</p>";
+
+}
+
+const checklistSauvegardee =
+localStorage.getItem(
+    "checklistHTML"
+);
+
+if(checklistSauvegardee){
+
+    document.getElementById(
+        "resultat"
+    ).innerHTML =
+    checklistSauvegardee;
+
+}
+
+
+
 remplirListeCategories();
 afficherInventaire();
 afficherFavoris();
 afficherCourses();
+
 ouvrirOnglet("voyageZone");
 
 </script>
