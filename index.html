@@ -165,9 +165,11 @@ label{
 }
 </style>
 
-<link rel="json
+<link rel="manifest" href="manifest.json">
 
-<link rel="icon" type="image/png" sizes="age/png" sizes="512x512" href="./ontent="#3bd4df">
+<link rel="apple-touch-icon" href="icon-512.png">
+
+<meta name="theme-color" content="#3bd4df">
 
 <meta name="apple-mobile-web-app-capable" content="yes">
 
@@ -231,7 +233,21 @@ onclick="sauvegarderFavori()">
 <input id="destination" placeholder="Ex : Vosges, Bretagne...">
 
 <label>📅 Combien de jours ?</label>
-<input id="jours" type="number" value="3">
+<input
+id="jours"
+type="number"
+value="3"
+oninput="gererMachineALaver()">
+<div id="zoneMachineALaver" style="display:none;">
+
+<label>🧺 Machine à laver disponible ?</label>
+
+<select id="machineALaver">
+    <option value="non">Non</option>
+    <option value="oui">Oui</option>
+</select>
+
+</div>
 
 <label>👶 Iris participe ?</label>
 <select id="iris">
@@ -715,37 +731,41 @@ const jours =
 parseInt(
 document.getElementById("jours").value
 ) || 1;
+let nbPyjamasIris = 2;
 
-// =======================
-// QUANTITES ADULTES
-// =======================
+if(jours >= 5){
+    nbPyjamasIris = 3;
+}
 
-html += `
-<div class="card">
-<h3>👨 Adultes - Vêtements</h3>
+if(jours > 7){
+    nbPyjamasIris = 4;
+}
 
-<label class="item">
-<input type="checkbox">
-${jours + 1} sous-vêtements
-</label>
+let nbPyjamasAdultes = 1;
 
-<label class="item">
-<input type="checkbox">
-${jours + 1} paires de chaussettes
-</label>
+if(jours > 7){
+    nbPyjamasAdultes = 2;
+}
 
-<label class="item">
-<input type="checkbox">
-${jours + 1} t-shirts
-</label>
-
-<label class="item">
-<input type="checkbox">
-${Math.ceil(jours / 2)} pyjamas
-</label>
-
-</div>
-`;
+const machineALaver =
+document.getElementById(
+    "machineALaver"
+)?.value || "non";
+const nbVetementsAdultes =
+(
+    jours > 10 &&
+    machineALaver === "oui"
+)
+? 10
+: jours + 1;
+const nbVetementsIris =
+(
+    jours > 10 &&
+    machineALaver === "oui"
+)
+? 10
+: jours + 2;
+``
 
 // =======================
 // QUANTITES IRIS
@@ -760,17 +780,17 @@ html += `
 
 <label class="item">
 <input type="checkbox">
-${jours + 2} bodys
+${nbVetementsIris} bodys
 </label>
 
 <label class="item">
 <input type="checkbox">
-${jours + 2} tenues
+${nbVetementsIris} tenues
 </label>
 
 <label class="item">
 <input type="checkbox">
-${Math.ceil(jours / 2) + 1} pyjamas
+${nbPyjamasIris} pyjamas
 </label>
 
 <label class="item">
@@ -802,10 +822,57 @@ section === "👶 Iris - Habits"
 continue;
 }
 
-if(
-section === "👨 Adultes"
-){
-continue;
+if(section === "👨 Adultes"){
+
+    html += `
+    <div class="card">
+    <h3>👨 Adultes</h3>
+
+    <label class="item">
+    <input type="checkbox">
+    ${nbVetementsAdultes} sous-vêtements
+    </label>
+
+    <label class="item">
+    <input type="checkbox">
+    ${nbVetementsAdultes} paires de chaussettes
+    </label>
+
+    <label class="item">
+    <input type="checkbox">
+    ${nbVetementsAdultes} t-shirts
+    </label>
+
+    <label class="item">
+    <input type="checkbox">
+    ${nbPyjamasAdultes} pyjama${nbPyjamasAdultes > 1 ? "s" : ""}
+    </label>
+    `;
+
+    inventaire[section].forEach(item=>{
+
+        if(
+            item === "Sous-vêtements" ||
+            item === "Chaussettes" ||
+            item === "T-shirts" ||
+            item === "Pyjama" ||
+            item === "Pull" ||
+            item === "Pantalon"
+        ){
+            return;
+        }
+
+        html += `
+        <label class="item">
+        <input type="checkbox">
+        ${item}
+        </label>
+        `;
+    });
+
+    html += `</div>`;
+
+    continue;
 }
 
 html += `<div class="card">
@@ -1551,6 +1618,23 @@ if ('serviceWorker' in navigator) {
     });
 
 }
+
+function gererMachineALaver(){
+
+    const jours =
+    parseInt(
+        document.getElementById("jours").value
+    ) || 0;
+
+    document.getElementById(
+        "zoneMachineALaver"
+    ).style.display =
+    jours > 10
+    ? "block"
+    : "none";
+
+}
+
 
 remplirListeCategories();
 afficherInventaire();
