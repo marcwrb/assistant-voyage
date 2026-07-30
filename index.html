@@ -1583,11 +1583,6 @@ document.getElementById(
 "resultat"
 ).innerHTML = html;
 
-localStorage.setItem(
-    "checklistHTML",
-    html
-);
-
 
 localStorage.setItem(
     "checklistHTML",
@@ -2908,6 +2903,32 @@ function sauvegarderEtatChecklist(){
 
 }
 
+function restaurerEtatChecklist(){
+
+    const etats =
+    JSON.parse(
+        localStorage.getItem(
+            "checklistEtat"
+        )
+    );
+
+    if(!etats){
+        return;
+    }
+
+    document
+    .querySelectorAll(
+        "#resultat input[type='checkbox']"
+    )
+    .forEach((cb,index)=>{
+
+        cb.checked =
+        etats[index] || false;
+
+    });
+
+}
+
 function reinitialiserChecklist(){
 
     if(
@@ -3007,6 +3028,8 @@ if(checklistSauvegardee){
         "resultat"
     ).innerHTML =
     checklistSauvegardee;
+
+    restaurerEtatChecklist();
 
 }
 
