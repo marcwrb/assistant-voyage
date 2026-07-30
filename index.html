@@ -807,6 +807,8 @@ localStorage.getItem("courses")
 ||
 [];
 
+const AFFICHER_COURSES = false;
+
 const modelesCoursesDefaut = {
 
 
@@ -2372,6 +2374,14 @@ function synchroniserCourses(){
     alert(
     "Recettes synchronisées ✅"
     );
+
+}
+
+if(!AFFICHER_COURSES){
+
+    document.getElementById(
+        "btnCourses"
+    ).style.display = "none";
 
 }
 
