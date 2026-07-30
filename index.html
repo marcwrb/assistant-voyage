@@ -194,6 +194,12 @@ onclick="ouvrirOnglet('voyageZone')">
 </button>
 
 <button
+id="btnCourses"
+onclick="ouvrirOnglet('coursesZone')">
+🛒 Courses
+</button>
+
+<button
 id="btnInventaire"
 onclick="ouvrirOnglet('inventaireZone')">
 📦 Inventaire
@@ -301,6 +307,146 @@ onclick="partagerChecklist()">
 <div id="resultat">
 <p>Clique sur <b>Générer ma checklist</b>.</p>
 </div>
+
+</div>
+
+</div>
+
+<div id="coursesZone" style="display:none;">
+
+<div class="card">
+
+<h2>🛒 Liste de courses</h2>
+
+<h3>⚡ Ajout rapide</h3>
+
+<div id="selectionProduits"></div>
+
+<br>
+
+<button
+class="action"
+onclick="synchroniserCourses()">
+🔄 Synchroniser le code
+</button>
+
+<button
+class="action"
+onclick="afficherModele('Petit-déjeuner')">
+🍞 Petit-déj
+</button>
+
+<button
+class="action"
+onclick="afficherModele('Bébé')">
+👶 Bébé
+</button>
+
+<button
+class="action"
+onclick="afficherModele('Route')">
+🚗 Route
+</button>
+
+<button
+class="action"
+onclick="afficherModele('Apéro')">
+🥂 Apéro
+</button>
+
+<hr>
+
+<h3>🍽️ Recettes</h3>
+
+<button
+class="action"
+onclick="afficherRecette('Crêpes')">
+🥞 Crêpes
+</button>
+
+<button
+class="action"
+onclick="afficherRecette('Pâtes carbo')">
+🍝 Pâtes carbo
+</button>
+
+<button
+class="action"
+onclick="afficherRecette('Croque-monsieur')">
+🥪 Croque-monsieur
+</button>
+
+<button
+class="action"
+onclick="afficherRecette('Pique-nique')">
+🧺 Pique-nique
+</button>
+
+<hr>
+
+<hr>
+
+<h3>➕ Nouveau modèle</h3>
+
+<input
+id="nomModele"
+placeholder="Ex : Barbecue">
+
+<input
+id="ingredientsModele"
+placeholder="Produit1, Produit2, Produit3">
+
+<button
+class="action"
+onclick="ajouterModelePerso()">
+Créer le modèle
+</button>
+
+<hr>
+
+<h3>🍽️ Nouvelle recette</h3>
+
+<input
+id="nomRecette"
+placeholder="Ex : Tartiflette">
+
+<input
+id="ingredientsRecette"
+placeholder="Pomme de terre, Reblochon, Lardons">
+
+<button
+class="action"
+onclick="ajouterRecettePerso()">
+Créer la recette
+</button>
+
+<input
+id="nouvelleCourse"
+placeholder="Ex : Couches">
+
+<button
+class="action"
+onclick="ajouterCourse()">
+➕ Ajouter
+</button>
+
+<br><br>
+
+<div id="listeCourses"></div>
+
+<br>
+
+<button
+class="action"
+onclick="viderCourses()">
+🗑️ Vider la liste
+</button>
+
+<button
+class="action"
+onclick="partagerCourses()">
+📲 Partager la liste
+</button>
 
 </div>
 
@@ -654,6 +800,103 @@ const activites = {
 
 };
 
+let courses =
+JSON.parse(
+localStorage.getItem("courses")
+)
+||
+[];
+
+const modelesCoursesDefaut = {
+
+
+"Petit-déjeuner":[
+"Pain",
+"Beurre",
+"Confiture",
+"Lait",
+"Café",
+"Jus d'orange",
+"Céréales"
+],
+
+"Bébé":[
+"Couches",
+"Lingettes",
+"Compotes",
+"Petits pots",
+"Lait en poudre"
+],
+
+"Route":[
+"Eau",
+"Chips",
+"Bonbons",
+"Sandwichs",
+"Fruits"
+],
+
+"Apéro":[
+"Chips",
+"Cacahuètes",
+"Saucisson",
+"Fromage",
+"Bières"
+]
+
+};
+
+const recettesDefaut = {
+
+"Crêpes":[
+"Farine",
+"Oeufs",
+"Lait",
+"Sucre",
+"Beurre"
+],
+
+"Pâtes carbo":[
+"Pâtes",
+"Lardons",
+"Crème fraîche",
+"Parmesan"
+],
+
+"Croque-monsieur":[
+"Pain de mie",
+"Jambon",
+"Fromage râpé"
+],
+
+"Pique-nique":[
+"Baguette",
+"Jambon",
+"Chips",
+"Eau",
+"Fromage"
+]
+
+};
+
+let modelesCourses =
+JSON.parse(
+localStorage.getItem("modelesCourses")
+)
+||
+JSON.parse(
+JSON.stringify(modelesCoursesDefaut)
+);
+
+let recettes =
+JSON.parse(
+localStorage.getItem("recettes")
+)
+||
+JSON.parse(
+JSON.stringify(recettesDefaut)
+);
+
 function afficherInventaire(){
 
 let html = "";
@@ -765,7 +1008,6 @@ const nbVetementsIris =
 )
 ? 10
 : jours + 2;
-``
 
 // =======================
 // QUANTITES IRIS
@@ -996,12 +1238,16 @@ genererListe();
 function ouvrirOnglet(id){
 
     document.getElementById(
-        "voyageZone"
-    ).style.display = "none";
+    "voyageZone"
+).style.display = "none";
 
-    document.getElementById(
-        "inventaireZone"
-    ).style.display = "none";
+document.getElementById(
+    "coursesZone"
+).style.display = "none";
+
+document.getElementById(
+    "inventaireZone"
+).style.display = "none";
 
     document.getElementById(
         id
@@ -1017,17 +1263,25 @@ function ouvrirOnglet(id){
 
     if(id === "voyageZone"){
 
-        document
-        .getElementById("btnVoyage")
-        .classList.add("active");
+    document
+    .getElementById("btnVoyage")
+    .classList.add("active");
 
-    }else{
+}
+else if(id === "coursesZone"){
 
-        document
-        .getElementById("btnInventaire")
-        .classList.add("active");
+    document
+    .getElementById("btnCourses")
+    .classList.add("active");
 
-    }
+}
+else{
+
+    document
+    .getElementById("btnInventaire")
+    .classList.add("active");
+
+}
 
 }
 
@@ -1608,6 +1862,88 @@ await navigator.share({
 
 }
 
+function sauvegarderCourses(){
+
+    localStorage.setItem(
+        "courses",
+        JSON.stringify(courses)
+    );
+
+}
+
+function afficherCourses(){
+
+    let html = "";
+
+    courses.forEach(
+    (course,index)=>{
+
+        html += `
+        <div class="item">
+
+        <label>
+
+<input type="checkbox">
+
+${course}
+
+</label>
+
+        <button
+        onclick="
+        supprimerCourse(${index})
+        ">
+        ❌
+        </button>
+
+        </div>
+        `;
+
+    });
+
+    document.getElementById(
+        "listeCourses"
+    ).innerHTML = html;
+
+}
+
+function ajouterCourse(){
+
+    const course =
+    document.getElementById(
+        "nouvelleCourse"
+    ).value.trim();
+
+    if(!course){
+        return;
+    }
+
+    if(!courses.includes(course)){
+
+    courses.push(course);
+
+}
+
+    sauvegarderCourses();
+
+    afficherCourses();
+
+    document.getElementById(
+        "nouvelleCourse"
+    ).value = "";
+
+}
+
+function supprimerCourse(index){
+
+    courses.splice(index,1);
+
+    sauvegarderCourses();
+
+    afficherCourses();
+
+}
+
 if ('serviceWorker' in navigator) {
 
     window.addEventListener('load', () => {
@@ -1616,6 +1952,72 @@ if ('serviceWorker' in navigator) {
         .register('sw.js');
 
     });
+
+}
+
+function viderCourses(){
+
+    if(
+        !confirm(
+            "Supprimer toute la liste ?"
+        )
+    ){
+        return;
+    }
+
+    courses = [];
+
+    sauvegarderCourses();
+
+    afficherCourses();
+
+}
+
+async function partagerCourses(){
+
+    let texte =
+    "🛒 Liste de courses\n\n";
+
+    courses.forEach(course=>{
+
+        texte +=
+        "☐ " +
+        course +
+        "\n";
+
+    });
+
+    if(navigator.share){
+
+        try{
+
+            await navigator.share({
+
+                title:
+                "Liste de courses",
+
+                text:
+                texte
+
+            });
+
+        }
+        catch(err){
+
+            console.log(err);
+
+        }
+
+    }else{
+
+        navigator.clipboard
+        .writeText(texte);
+
+        alert(
+        "Liste copiée dans le presse-papiers ✅"
+        );
+
+    }
 
 }
 
@@ -1635,11 +2037,348 @@ function gererMachineALaver(){
 
 }
 
+function afficherModele(nomModele){
+
+    let html = `
+    <div class="card">
+
+    <h3>${nomModele}</h3>
+    `;
+
+    modelesCourses[nomModele]
+    .forEach(item=>{
+
+        html += `
+        <label class="item">
+
+        <input
+        type="checkbox"
+        class="produitModele"
+        value="${item}">
+
+        ${item}
+
+        </label>
+        `;
+
+    });
+
+    html += `
+
+    <br>
+
+    <button
+    class="action"
+    onclick="ajouterSelection()">
+    ✅ Ajouter la sélection
+    </button>
+
+    <br><br>
+
+    <button
+    class="action"
+    onclick="ajouterToutModele('${nomModele}')">
+    ➕ Tout ajouter
+    </button>
+
+    </div>
+    `;
+
+    document.getElementById(
+        "selectionProduits"
+    ).innerHTML = html;
+
+}
+
+function ajouterSelection(){
+
+    document
+    .querySelectorAll(
+    ".produitModele:checked"
+    )
+    .forEach(cb=>{
+
+        if(
+            !courses.includes(
+                cb.value
+            )
+        ){
+
+            courses.push(
+                cb.value
+            );
+
+        }
+
+    });
+
+    sauvegarderCourses();
+
+    afficherCourses();
+
+    document.getElementById(
+    "selectionProduits"
+).innerHTML = "";
+
+}
+
+function ajouterToutModele(nomModele){
+
+    modelesCourses[nomModele]
+    .forEach(item=>{
+
+        if(
+            !courses.includes(item)
+        ){
+
+            courses.push(item);
+
+        }
+
+    });
+
+    sauvegarderCourses();
+
+    afficherCourses();
+
+    document.getElementById(
+    "selectionProduits"
+).innerHTML = "";
+
+}
+
+function afficherRecette(nomRecette){
+
+    let html = `
+    <div class="card">
+
+    <h3>🍽️ ${nomRecette}</h3>
+    `;
+
+    recettes[nomRecette]
+    .forEach(item=>{
+
+        html += `
+        <label class="item">
+
+        <input
+        type="checkbox"
+        class="produitRecette"
+        value="${item}">
+
+        ${item}
+
+        </label>
+        `;
+
+    });
+
+    html += `
+
+    <br>
+
+    <button
+    class="action"
+    onclick="ajouterSelectionRecette()">
+    ✅ Ajouter la sélection
+    </button>
+
+    <br><br>
+
+    <button
+    class="action"
+    onclick="ajouterTouteRecette('${nomRecette}')">
+    ➕ Tout ajouter
+    </button>
+
+    </div>
+    `;
+
+    document.getElementById(
+        "selectionProduits"
+    ).innerHTML = html;
+
+}
+
+function ajouterSelectionRecette(){
+
+    document
+    .querySelectorAll(
+    ".produitRecette:checked"
+    )
+    .forEach(cb=>{
+
+        if(
+            !courses.includes(cb.value)
+        ){
+
+            courses.push(cb.value);
+
+        }
+
+    });
+
+    sauvegarderCourses();
+
+    afficherCourses();
+
+}
+
+function ajouterTouteRecette(nomRecette){
+
+    recettes[nomRecette]
+    .forEach(item=>{
+
+        if(
+            !courses.includes(item)
+        ){
+
+            courses.push(item);
+
+        }
+
+    });
+
+    sauvegarderCourses();
+
+    afficherCourses();
+
+    document.getElementById(
+    "selectionProduits"
+).innerHTML = "";
+
+}
+
+function sauvegarderModeles(){
+
+    localStorage.setItem(
+        "modelesCourses",
+        JSON.stringify(modelesCourses)
+    );
+
+}
+
+function sauvegarderRecettes(){
+
+    localStorage.setItem(
+        "recettes",
+        JSON.stringify(recettes)
+    );
+
+}
+
+function ajouterModelePerso(){
+
+    const nom =
+    document.getElementById(
+        "nomModele"
+    ).value.trim();
+
+    const ingredients =
+    document.getElementById(
+        "ingredientsModele"
+    )
+    .value
+    .split(",")
+    .map(item=>item.trim())
+    .filter(item=>item);
+
+    if(!nom){
+        return;
+    }
+
+    modelesCourses[nom] =
+    ingredients;
+
+    sauvegarderModeles();
+
+    alert(
+    "Modèle créé ✅"
+    );
+
+}
+
+function ajouterRecettePerso(){
+
+    const nom =
+    document.getElementById(
+        "nomRecette"
+    ).value.trim();
+
+    const ingredients =
+    document.getElementById(
+        "ingredientsRecette"
+    )
+    .value
+    .split(",")
+    .map(item=>item.trim())
+    .filter(item=>item);
+
+    if(!nom){
+        return;
+    }
+
+    recettes[nom] =
+    ingredients;
+
+    sauvegarderRecettes();
+
+    alert(
+    "Recette créée ✅"
+    );
+
+}
+
+function synchroniserCourses(){
+
+    for(
+        const modele
+        in
+        modelesCoursesDefaut
+    ){
+
+        if(
+            !modelesCourses[modele]
+        ){
+
+            modelesCourses[modele] =
+            [...modelesCoursesDefaut[modele]];
+
+        }
+
+    }
+
+    for(
+        const recette
+        in
+        recettesDefaut
+    ){
+
+        if(
+            !recettes[recette]
+        ){
+
+            recettes[recette] =
+            [...recettesDefaut[recette]];
+
+        }
+
+    }
+
+    sauvegarderModeles();
+
+    sauvegarderRecettes();
+
+    alert(
+    "Recettes synchronisées ✅"
+    );
+
+}
 
 remplirListeCategories();
 afficherInventaire();
 afficherFavoris();
-
+afficherCourses();
 ouvrirOnglet("voyageZone");
 
 </script>
