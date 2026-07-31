@@ -308,6 +308,11 @@ id="btnInventaire"
 onclick="ouvrirOnglet('inventaireZone')">
 📦 Inventaire
 </button>
+<button
+id="btnAdmin"
+onclick="ouvrirOnglet('adminZone')">
+⚙️ Admin
+</button>
 
 </div>
 
@@ -445,49 +450,70 @@ class="activites-grid">
 <label>
 <input
 type="checkbox"
-onchange="sauvegarderEtatChecklist()">
+onchange="
+sauvegarderEtatChecklist();
+envoyerChecklistFirebase();
+">
 Piscine
 </label>
 
 <label>
 <input
 type="checkbox"
-onchange="sauvegarderEtatChecklist()">
+onchange="
+sauvegarderEtatChecklist();
+envoyerChecklistFirebase();
+">
 Plage
 </label>
 
 <label>
 <input
 type="checkbox"
-onchange="sauvegarderEtatChecklist()">
+onchange="
+sauvegarderEtatChecklist();
+envoyerChecklistFirebase();
+">
 Randonnée
 </label>
 
 <label>
 <input
 type="checkbox"
-onchange="sauvegarderEtatChecklist()">
+onchange="
+sauvegarderEtatChecklist();
+envoyerChecklistFirebase();
+">
 Vélo
 </label>
 
 <label>
 <input
 type="checkbox"
-onchange="sauvegarderEtatChecklist()">
+onchange="
+sauvegarderEtatChecklist();
+envoyerChecklistFirebase();
+">
 Surf
 </label>
 
 <label>
 <input
 type="checkbox"
-onchange="sauvegarderEtatChecklist()">
+onchange="
+sauvegarderEtatChecklist();
+envoyerChecklistFirebase();
+">
 Course à pied
 </label>
 
 <label>
 <input
 type="checkbox"
-onchange="sauvegarderEtatChecklist()">
+onchange="
+sauvegarderEtatChecklist();
+envoyerChecklistFirebase();
+">
 Golf
 </label>
 
@@ -721,8 +747,6 @@ onclick="partagerCourses()">
 
 <div class="card">
 
-<hr>
-
 <h2>➕ Nouvelle catégorie</h2>
 
 <input
@@ -752,39 +776,11 @@ placeholder="Ex : Brassards Iris">
 class="action"
 onclick="ajouterObjet()">
 Ajouter
-</button>    
-
-<button
-class="action"
-onclick="synchroniserInventaire()">
-🔄 Synchroniser avec le code
-</button>
-
-<button
-class="action"
-onclick="reinitialiserInventaire()">
-♻️ Réinitialiser depuis le code
 </button>
 
 <br><br>
 
 <h2>📦 Inventaire complet</h2>
-
-<button
-class="action"
-onclick="exporterInventaire()">
-💾 Exporter l'inventaire
-</button>
-
-<br><br>
-
-<input
-type="file"
-id="importInventaire"
-accept=".json"
-onchange="importerInventaire(event)">
-
-<br><br>
 
 <div id="inventaireListe"></div>
 
@@ -792,11 +788,104 @@ onchange="importerInventaire(event)">
 
 </div>
 
-</div>
+<div id="adminZone" style="display:none;">
+
+<div class="card">
+
+<h2>⚙️ Administration</h2>
+
+<h3>📦 Inventaire</h3>
+
+<button
+class="action"
+onclick="synchroniserInventaire()">
+🔄 Mettre à jour l'inventaire
+</button>
+
+<button
+class="action"
+onclick="reinitialiserInventaire()">
+♻️ Réinitialiser l'inventaire
+</button>
+
+<hr>
+
+<h3>⭐ Favoris</h3>
+
+<button
+class="action"
+onclick="reinitialiserFavoris()">
+♻️ Réinitialiser les favoris
+</button>
+
+<hr>
+
+<h3>🛒 Courses</h3>
+
+<button
+class="action"
+onclick="synchroniserCourses()">
+🔄 Synchroniser les recettes
+</button>
+
+<hr>
+
+<h3>📝 Développement</h3>
+
+<button
+class="action"
+onclick="testFirebase()">
+🧪 Test Firebase
+</button>
+
+<button
+class="action"
+onclick="exporterDonneesCompletes()">
+💾 Export complet
+</button>
+
+<hr>
+
+<h3>💣 Réinitialisation complète</h3>
+
+<button
+class="action"
+style="background:#dc3545;"
+onclick="reinitialiserApplication()">
+💣 Réinitialisation complète
+</button>
 
 </div>
 
-<script>
+</div>
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+
+import {
+    getFirestore,
+    doc,
+    setDoc,
+    onSnapshot
+}
+from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC41hixzKKYCgabzzYAYyrlzH9xuLr80oY",
+  authDomain: "pret-a-partir-614bc.firebaseapp.com",
+  projectId: "pret-a-partir-614bc",
+  storageBucket: "pret-a-partir-614bc.firebasestorage.app",
+  messagingSenderId: "119823346297",
+  appId: "1:119823346297:web:19310bc1661a95c295c2a8"
+};
+
+const app =
+initializeApp(firebaseConfig);
+
+const db =
+getFirestore(app);
 
 const inventaireDefaut = {
 
@@ -1469,28 +1558,40 @@ html += `
 <label class="item">
 <input
 type="checkbox"
-onchange="sauvegarderEtatChecklist()">
+onchange="
+sauvegarderEtatChecklist();
+envoyerChecklistFirebase();
+">
 ${nbVetementsIris} bodys
 </label>
 
 <label class="item">
 <input
 type="checkbox"
-onchange="sauvegarderEtatChecklist()">
+onchange="
+sauvegarderEtatChecklist();
+envoyerChecklistFirebase();
+">
 ${nbVetementsIris} tenues
 </label>
 
 <label class="item">
 <input
 type="checkbox"
-onchange="sauvegarderEtatChecklist()">
+onchange="
+sauvegarderEtatChecklist();
+envoyerChecklistFirebase();
+">
 ${nbPyjamasIris} pyjamas
 </label>
 
 <label class="item">
 <input
 type="checkbox"
-onchange="sauvegarderEtatChecklist()">
+onchange="
+sauvegarderEtatChecklist();
+envoyerChecklistFirebase();
+">
 ${jours * 5} couches
 </label>
 
@@ -1555,42 +1656,60 @@ if(
     <label class="item">
     <input
 type="checkbox"
-onchange="sauvegarderEtatChecklist()">
+onchange="
+sauvegarderEtatChecklist();
+envoyerChecklistFirebase();
+">
     ${nbVetementsAdultes} sous-vêtements
     </label>
 
     <label class="item">
     <input
 type="checkbox"
-onchange="sauvegarderEtatChecklist()">
+onchange="
+sauvegarderEtatChecklist();
+envoyerChecklistFirebase();
+">
     ${nbVetementsAdultes} paires de chaussettes
     </label>
 
     <label class="item">
     <input
 type="checkbox"
-onchange="sauvegarderEtatChecklist()">
+onchange="
+sauvegarderEtatChecklist();
+envoyerChecklistFirebase();
+">
     ${nbVetementsAdultes} t-shirts
     </label>
 
     <label class="item">
     <input
 type="checkbox"
-onchange="sauvegarderEtatChecklist()">
+onchange="
+sauvegarderEtatChecklist();
+envoyerChecklistFirebase();
+">
     ${nbPyjamasAdultes} pyjama${nbPyjamasAdultes > 1 ? "s" : ""}
     </label>
 
 <label class="item">
 <input
 type="checkbox"
-onchange="sauvegarderEtatChecklist()">
+onchange="
+sauvegarderEtatChecklist();
+envoyerChecklistFirebase();
+">
 ${nbPulls} pull${nbPulls > 1 ? "s" : ""}
 </label>
 
 <label class="item">
 <input
 type="checkbox"
-onchange="sauvegarderEtatChecklist()">
+onchange="
+sauvegarderEtatChecklist();
+envoyerChecklistFirebase();
+">
 ${nbPantalons} pantalon${nbPantalons > 1 ? "s" : ""}
 </label>
 
@@ -1613,7 +1732,10 @@ item === "Pantalon"
         <label class="item">
         <input
 type="checkbox"
-onchange="sauvegarderEtatChecklist()">
+onchange="
+sauvegarderEtatChecklist();
+envoyerChecklistFirebase();
+">
         ${item}
         </label>
         `;
@@ -1635,7 +1757,10 @@ html += `
 <label class="item">
 <input
 type="checkbox"
-onchange="sauvegarderEtatChecklist()">
+onchange="
+sauvegarderEtatChecklist();
+envoyerChecklistFirebase();
+">
 ${item}
 </label>
 `;
@@ -1664,7 +1789,10 @@ html += `
 <label class="item">
 <input
 type="checkbox"
-onchange="sauvegarderEtatChecklist()">
+onchange="
+sauvegarderEtatChecklist();
+envoyerChecklistFirebase();
+">
 ${item}
 </label>
 `;
@@ -1706,7 +1834,10 @@ html += `
 <label class="item">
 <input
 type="checkbox"
-onchange="sauvegarderEtatChecklist()">
+onchange="
+sauvegarderEtatChecklist();
+envoyerChecklistFirebase();
+">
 ${item}
 </label>
 `;
@@ -1748,7 +1879,10 @@ document
         <label class="item">
             <input
             type="checkbox"
-            onchange="sauvegarderEtatChecklist()">
+            onchange="
+sauvegarderEtatChecklist();
+envoyerChecklistFirebase();
+">
             ${item}
         </label>
         `;
@@ -1787,7 +1921,10 @@ if(inventaire["🚗 Avant départ"]){
         <label class="item">
             <input
             type="checkbox"
-            onchange="sauvegarderEtatChecklist()">
+            onchange="
+sauvegarderEtatChecklist();
+envoyerChecklistFirebase();
+">
             ${item}
         </label>
         `;
@@ -1848,6 +1985,10 @@ document.getElementById(
     "inventaireZone"
 ).style.display = "none";
 
+document.getElementById(
+    "adminZone"
+).style.display = "none";
+
     document.getElementById(
         id
     ).style.display = "block";
@@ -1874,10 +2015,17 @@ else if(id === "coursesZone"){
     .classList.add("active");
 
 }
-else{
+else if(id === "inventaireZone"){
 
     document
     .getElementById("btnInventaire")
+    .classList.add("active");
+
+}
+else{
+
+    document
+    .getElementById("btnAdmin")
     .classList.add("active");
 
 }
@@ -2055,89 +2203,6 @@ categorie
     remplirListeCategories();
 
     afficherInventaire();
-
-}
-
-function exporterInventaire(){
-
-    const contenu =
-    JSON.stringify(
-        inventaire,
-        null,
-        2
-    );
-
-    const blob =
-    new Blob(
-        [contenu],
-        {
-            type:"application/json"
-        }
-    );
-
-    const url =
-    URL.createObjectURL(blob);
-
-    const lien =
-    document.createElement("a");
-
-    lien.href = url;
-
-    lien.download =
-    "inventaire.json";
-
-    lien.click();
-
-    URL.revokeObjectURL(url);
-
-}
-
-function importerInventaire(event){
-
-    const fichier =
-    event.target.files[0];
-
-    if(!fichier){
-        return;
-    }
-
-    const lecteur =
-    new FileReader();
-
-    lecteur.onload =
-    function(e){
-
-        try{
-
-            inventaire =
-            JSON.parse(
-                e.target.result
-            );
-
-            sauvegarderInventaire();
-
-            remplirListeCategories();
-
-            afficherInventaire();
-
-            alert(
-            "Inventaire importé avec succès ✅"
-            );
-
-        }
-        catch{
-
-            alert(
-            "Fichier invalide ❌"
-            );
-
-        }
-
-    };
-
-    lecteur.readAsText(
-        fichier
-    );
 
 }
 
@@ -2446,7 +2511,6 @@ async function partagerChecklist(){
         .forEach(item=>{
 
             texte +=
-            "☐ " +
             item.textContent.trim()
             + "\n";
 
@@ -2521,7 +2585,10 @@ function afficherCourses(){
 
 <input
 type="checkbox"
-onchange="sauvegarderEtatChecklist()">
+onchange="
+sauvegarderEtatChecklist();
+envoyerChecklistFirebase();
+">
 
 ${course}
 
@@ -3295,6 +3362,270 @@ function gererTypeVoyage(){
 
 }
 
+function reinitialiserApplication(){
+
+    if(
+        !confirm(
+            "ATTENTION\n\nToutes les données enregistrées seront supprimées.\n\nContinuer ?"
+        )
+    ){
+        return;
+    }
+
+    localStorage.clear();
+
+    location.reload();
+
+}
+
+function exporterDonneesCompletes(){
+
+    const sauvegarde = {
+
+        inventaire: inventaire,
+        favoris: favoris,
+        courses: courses,
+        modelesCourses: modelesCourses,
+        recettes: recettes,
+
+        checklistHTML:
+        localStorage.getItem(
+            "checklistHTML"
+        ),
+
+        checklistEtat:
+        localStorage.getItem(
+            "checklistEtat"
+        )
+
+    };
+
+    const contenu =
+    JSON.stringify(
+        sauvegarde,
+        null,
+        2
+    );
+
+    const blob =
+    new Blob(
+        [contenu],
+        {
+            type:"application/json"
+        }
+    );
+
+    const url =
+    URL.createObjectURL(blob);
+
+    const lien =
+    document.createElement("a");
+
+    lien.href = url;
+
+    lien.download =
+    "pret-a-partir-backup.json";
+
+    lien.click();
+
+    URL.revokeObjectURL(url);
+
+}
+
+function reinitialiserFavoris(){
+
+    if(
+        !confirm(
+            "Remettre les favoris exactement comme dans le code ?"
+        )
+    ){
+        return;
+    }
+
+    favoris = {
+
+        "🏠 Week-end PLV":{
+            destination:"PLV",
+            jours:3,
+            participantAurore:true,
+            participantMarc:true,
+            participantIris:true,
+            typeVoyage:"Week-end famille",
+            activites:[]
+        },
+
+        "⛰️ Week-end Vosges":{
+            destination:"Vosges",
+            jours:3,
+            participantAurore:true,
+            participantMarc:true,
+            participantIris:true,
+            typeVoyage:"Montagne",
+            activites:["Randonnée"]
+        },
+
+        "👨‍👩‍👧 Chez les copains":{
+            destination:"Chez les copains",
+            jours:2,
+            participantAurore:true,
+            participantMarc:true,
+            participantIris:true,
+            typeVoyage:"Week-end famille",
+            activites:["Piscine"]
+        },
+
+        "🏄 Surf à Lacanau":{
+            destination:"Lacanau",
+            jours:7,
+            participantAurore:true,
+            participantMarc:true,
+            participantIris:true,
+            participantMaya:false,
+            typeVoyage:"Plage",
+            activites:[
+                "Surf",
+                "Plage"
+            ]
+        }
+
+    };
+
+    sauvegarderFavoris();
+
+    afficherFavoris();
+
+    alert(
+        "Favoris réinitialisés ✅"
+    );
+
+}
+
+async function envoyerChecklistFirebase(){
+
+    const etats = [];
+
+    document
+    .querySelectorAll(
+        "#resultat input[type='checkbox']"
+    )
+    .forEach(cb => {
+
+        etats.push(
+            cb.checked
+        );
+
+    });
+
+    await setDoc(
+
+        doc(
+            db,
+            "checklists",
+            "famille"
+        ),
+
+        {
+            etat: etats
+        }
+
+    );
+
+}
+
+
+function ecouterChecklistFirebase(){
+
+    onSnapshot(
+
+        doc(
+            db,
+            "checklists",
+            "famille"
+        ),
+
+        (snapshot) => {
+
+            const data =
+            snapshot.data();
+
+            if(!data){
+                return;
+            }
+
+            document
+            .querySelectorAll(
+                "#resultat input[type='checkbox']"
+            )
+            .forEach((cb,index) => {
+
+                cb.checked =
+                data.etat[index]
+                || false;
+
+            });
+
+        }
+
+    );
+
+}
+
+async function testFirebase(){
+
+    await setDoc(
+        doc(
+            db,
+            "checklists",
+            "famille"
+        ),
+        {
+            test: "Bonjour Marc"
+        }
+    );
+
+    alert(
+        "Firebase fonctionne ✅"
+    );
+
+}
+
+Object.assign(window, {
+    ouvrirOnglet,
+    genererListe,
+    reinitialiserChecklist,
+    partagerChecklist,
+    sauvegarderFavori,
+    chargerFavoriPerso,
+    supprimerFavori,
+    ajouterObjet,
+    modifierObjet,
+    supprimerObjet,
+    ajouterCategorie,
+    supprimerCategorie,
+    ajouterCourse,
+    supprimerCourse,
+    viderCourses,
+    ajouterModelePerso,
+ajouterRecettePerso,
+sauvegarderEtatChecklist,
+    partagerCourses,
+    afficherModele,
+    afficherRecette,
+    ajouterSelection,
+    ajouterSelectionRecette,
+    ajouterTouteRecette,
+    ajouterToutModele,
+    synchroniserInventaire,
+    synchroniserCourses,
+    reinitialiserInventaire,
+    reinitialiserFavoris,
+    reinitialiserApplication,
+    exporterDonneesCompletes,
+    gererTypeVoyage,
+    gererMachineALaver,
+    testFirebase,
+    envoyerChecklistFirebase
+});
 
 remplirListeCategories();
 afficherInventaire();
@@ -3302,6 +3633,10 @@ afficherFavoris();
 afficherCourses();
 
 ouvrirOnglet("voyageZone");
+
+ecouterChecklistFirebase();
+
+
 
 </script>
 
