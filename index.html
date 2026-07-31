@@ -263,6 +263,10 @@ label{
     }
 }
 
+#optionsZone{
+    margin-bottom:25px;
+}
+
 </style>
 
 <link rel="manifest" href="manifest.json">
@@ -400,13 +404,17 @@ id="participantMaya">
 
 <label>🏕️ Type de voyage</label>
 
-<select id="typeVoyage">
+<select
+id="typeVoyage"
+onchange="gererTypeVoyage()">
+
     <option>Week-end famille</option>
     <option>Plage</option>
     <option>Montagne</option>
     <option>Ski</option>
     <option>Camping</option>
     <option>Travail</option>
+
 </select>
 
 </div>
@@ -445,6 +453,13 @@ Piscine
 <input
 type="checkbox"
 onchange="sauvegarderEtatChecklist()">
+Plage
+</label>
+
+<label>
+<input
+type="checkbox"
+onchange="sauvegarderEtatChecklist()">
 Randonnée
 </label>
 
@@ -466,19 +481,64 @@ Surf
 <input
 type="checkbox"
 onchange="sauvegarderEtatChecklist()">
-Plage
+Course à pied
 </label>
 
 <label>
 <input
 type="checkbox"
 onchange="sauvegarderEtatChecklist()">
-Course à pied
+Golf
 </label>
 
 </div>
 
 <br>
+
+<h3 class="section-title">
+⭐ Affaires facultatives
+</h3>
+
+<div
+id="optionsZone"
+class="activites-grid">
+
+<label>
+<input type="checkbox">
+Hamac
+</label>
+
+<label>
+<input type="checkbox">
+Kayak
+</label>
+
+<label>
+<input type="checkbox">
+Jeux d'extérieur
+</label>
+
+<label>
+<input type="checkbox">
+Drone
+</label>
+
+<label>
+<input type="checkbox">
+Appareil photo
+</label>
+
+<label>
+<input type="checkbox">
+Canne à pêche
+</label>
+
+<label>
+<input type="checkbox">
+Enceinte Bluetooth
+</label>
+
+</div>
 
 <button
 class="action btn-generate"
@@ -820,7 +880,6 @@ const inventaireDefaut = {
 "🚼 Iris - Sorties":[
 "Poussette",
 "Porte bébé",
-"Tapis de vie",
 "Bob",
 "Crème solaire",
 "Lunettes de soleil",
@@ -828,16 +887,12 @@ const inventaireDefaut = {
 ],
 
 "🎒 Commun":[
-"Téléphone",
-"Chargeur téléphone",
 "Batterie externe",
-"Carte identité",
-"Permis",
-"Carte bancaire",
 "Trousse à pharmacie",
 "Clés",
-"Lunettes de soleil",
-"Jeux de sociétés"
+"Ipad",
+"Jeux de sociétés",
+"Glacière decathlon"
 ],
 
 "👩 Aurore":[
@@ -847,8 +902,18 @@ const inventaireDefaut = {
 "Pull",
 "Pantalon",
 "Pyjama",
+"Birkenstock",
+"Téléphone",
+"Chargeur téléphone",
+"Papier d'identité",
+"Lunettes de soleil",
+"Airpod",
 "Trousse de toilette",
+"Casquette/Chapeau",
+"Kindle",
+"Mots fléchés",
 "Brosse à cheveux",
+"Stick visage solaire",
 "Gourde eau",
 "Maquillage"
 ],
@@ -860,6 +925,11 @@ const inventaireDefaut = {
 "Pull",
 "Pantalon",
 "Pyjama",
+"Claquette",
+"Téléphone",
+"Chargeur téléphone",
+"Porte carte",
+"Lunettes de soleil",
 "Montre",
 "Trousse de toilette",
 "Coupe ongles",
@@ -879,16 +949,18 @@ const inventaireDefaut = {
 
 "🚗 Avant départ":[
 "Vider les poubelles",
+"Arroser les plantes",
 "Nourrir Maya",
 "Fermer les fenêtres",
 "Fermer les volets",
-"Couper les lumières",
+"Eteindre les lumières",
 "Brancher l'alarme",
 "Prendre les clés du logement",
 "Vider le lave-vaisselle",
 "Vider le frigo des produits périssables",
 "Nourriture pour la route",
 "Remplir les gourdes",
+"Pique nique pour la route",
 "Vérifier les biberons et repas d'Iris"
 ]
 
@@ -939,7 +1011,23 @@ localStorage.getItem("favoris")
     participantIris:true,
     typeVoyage:"Week-end famille",
     activites:["Piscine"]
+},
+
+"🏄 Surf à Lacanau":{
+    destination:"Lacanau",
+    jours:7,
+    participantAurore:true,
+    participantMarc:true,
+    participantIris:true,
+    participantMaya:false,
+    typeVoyage:"Plage",
+    activites:[
+        "Surf",
+        "Plage"
+    ]
+
 }
+
 
 };
 
@@ -980,14 +1068,14 @@ const typesVoyage = {
 "Plage":[
 "Parasol",
 "Serviette plage",
+"Chaussures Vatalo",
+"Sac Hoallen",
 "Crème solaire"
 ],
 
 "Travail":[
 "Ordinateur portable",
-"Chargeur PC",
-"Bloc-notes",
-"Stylos"
+"Chargeur PC"
 ]
 
 };
@@ -1041,6 +1129,57 @@ const activites = {
 "Gel",
 "Casque musique + chargeur"
 ],
+
+"Golf":[
+"Sac de golf",
+"Chaussures de golf",
+"Pantalon / Short golf",
+"Polos golf"
+],
+
+};
+
+const affairesFacultatives = {
+
+"Hamac":[
+"Hamac",
+"Cordes",
+"Mousquetons"
+],
+
+"Kayak":[
+"Kayak"
+],
+
+"Jeux d'extérieur":[
+"Molky",
+"Jeu du Roi",
+"Slackline",
+"Boules de petanque"
+],
+
+"Drone":[
+"Drone",
+"Batteries drone",
+"Télécommande drone"
+],
+
+"Appareil photo":[
+"Boîtier photo",
+"Objectif",
+"Chargeur batterie"
+],
+
+"Canne à pêche":[
+"Canne à pêche",
+"Leurres",
+"Fil de rechange"
+],
+
+"Enceinte Bluetooth":[
+"Enceinte Bluetooth",
+"Chargeur enceinte"
+]
 
 };
 
@@ -1352,7 +1491,7 @@ ${nbPyjamasIris} pyjamas
 <input
 type="checkbox"
 onchange="sauvegarderEtatChecklist()">
-${jours * 4} couches
+${jours * 5} couches
 </label>
 
 </div>
@@ -1363,7 +1502,10 @@ ${jours * 4} couches
 // INVENTAIRE DE BASE
 // =======================
 
-for(const section in inventaire){
+const sections = Object.keys(inventaire)
+.filter(section => section !== "🚗 Avant départ");
+
+for(const section of sections){
 
 if(
 !iris &&
@@ -1541,7 +1683,7 @@ html += `
 
 document
 .querySelectorAll(
-".checkbox-group input[type='checkbox']"
+"#activitesZone input[type='checkbox']"
 )
 .forEach(cb=>{
 
@@ -1576,6 +1718,86 @@ html += `
 `;
 
 });
+
+// =======================
+// AFFAIRES FACULTATIVES
+// =======================
+
+let htmlAffairesFacultatives = "";
+
+document
+.querySelectorAll(
+"#optionsZone input[type='checkbox']"
+)
+.forEach(cb=>{
+
+    if(!cb.checked){
+        return;
+    }
+
+    const nom =
+    cb.parentElement.textContent.trim();
+
+    if(!affairesFacultatives[nom]){
+        return;
+    }
+
+    affairesFacultatives[nom].forEach(item=>{
+
+        htmlAffairesFacultatives += `
+        <label class="item">
+            <input
+            type="checkbox"
+            onchange="sauvegarderEtatChecklist()">
+            ${item}
+        </label>
+        `;
+
+    });
+
+});
+
+if(htmlAffairesFacultatives){
+
+    html += `
+    <div class="card">
+
+    <h3>⭐ Affaires facultatives</h3>
+
+    ${htmlAffairesFacultatives}
+
+    </div>
+    `;
+}
+
+// =======================
+// AVANT DEPART
+// =======================
+
+if(inventaire["🚗 Avant départ"]){
+
+    html += `
+    <div class="card">
+    <h3>🚗 Avant départ</h3>
+    `;
+
+    inventaire["🚗 Avant départ"].forEach(item => {
+
+        html += `
+        <label class="item">
+            <input
+            type="checkbox"
+            onchange="sauvegarderEtatChecklist()">
+            ${item}
+        </label>
+        `;
+
+    });
+
+    html += `
+    </div>
+    `;
+}
 
 // =======================
 
@@ -2998,6 +3220,16 @@ function reinitialiserChecklist(){
 
     });
 
+    document
+.querySelectorAll(
+"#optionsZone input[type='checkbox']"
+)
+.forEach(cb=>{
+
+    cb.checked = false;
+
+});
+
     // Machine à laver
     document.getElementById(
         "machineALaver"
@@ -3033,6 +3265,35 @@ if(checklistSauvegardee){
 
 }
 
+function gererTypeVoyage(){
+
+    const typeVoyage =
+    document.getElementById(
+        "typeVoyage"
+    ).value;
+
+    document
+    .querySelectorAll(
+        "#activitesZone input[type='checkbox']"
+    )
+    .forEach(cb=>{
+
+        const activite =
+        cb.parentElement.textContent.trim();
+
+        if(activite === "Plage"){
+
+            if(typeVoyage === "Plage"){
+
+                cb.checked = true;
+
+            }
+
+        }
+
+    });
+
+}
 
 
 remplirListeCategories();
