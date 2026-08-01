@@ -267,6 +267,22 @@ label{
     margin-bottom:25px;
 }
 
+details summary{
+    cursor:pointer;
+    font-weight:bold;
+    color:#0078D4;
+    font-size:18px;
+    padding:5px;
+}
+
+details summary:hover{
+    color:#005ea6;
+}
+
+.contenu-section{
+    margin-top:10px;
+}
+
 </style>
 
 <link rel="manifest" href="manifest.json">
@@ -304,10 +320,17 @@ onclick="ouvrirOnglet('coursesZone')">
 </button>
 
 <button
+id="btnPartage"
+onclick="ouvrirOnglet('partageZone')">
+👨‍👩‍👧 Checklit partagée
+</button>
+
+<button
 id="btnInventaire"
 onclick="ouvrirOnglet('inventaireZone')">
 📦 Inventaire
 </button>
+
 <button
 id="btnAdmin"
 onclick="ouvrirOnglet('adminZone')">
@@ -320,9 +343,13 @@ onclick="ouvrirOnglet('adminZone')">
 
 <div id="voyageZone">
 
-<div class="card">
+<div class="card" id="cardFavoris">
 
-<h2>⭐ Mes favoris</h2>
+<details open id="detailsFavoris">
+
+<summary>
+⭐ Mes favoris
+</summary>
 
 <div id="favorisListe"></div>
 
@@ -338,11 +365,17 @@ onclick="sauvegarderFavori()">
 ⭐ Sauvegarder ce voyage
 </button>
 
+</details>
+
 </div>
 
-<div class="card">
+<div class="card" id="cardPreparation">
 
-<h2>🧳 Préparer un voyage</h2>
+<details open id="detailsPreparation">
+
+<summary>
+🧳 Préparer un voyage
+</summary>
 
 <label>📍 Où allez-vous ?</label>
 <input id="destination" placeholder="Ex : Vosges, Bretagne...">
@@ -452,7 +485,6 @@ class="activites-grid">
 type="checkbox"
 onchange="
 sauvegarderEtatChecklist();
-envoyerChecklistFirebase();
 ">
 Piscine
 </label>
@@ -462,7 +494,6 @@ Piscine
 type="checkbox"
 onchange="
 sauvegarderEtatChecklist();
-envoyerChecklistFirebase();
 ">
 Plage
 </label>
@@ -472,7 +503,6 @@ Plage
 type="checkbox"
 onchange="
 sauvegarderEtatChecklist();
-envoyerChecklistFirebase();
 ">
 Randonnée
 </label>
@@ -482,7 +512,6 @@ Randonnée
 type="checkbox"
 onchange="
 sauvegarderEtatChecklist();
-envoyerChecklistFirebase();
 ">
 Vélo
 </label>
@@ -492,7 +521,6 @@ Vélo
 type="checkbox"
 onchange="
 sauvegarderEtatChecklist();
-envoyerChecklistFirebase();
 ">
 Surf
 </label>
@@ -502,7 +530,6 @@ Surf
 type="checkbox"
 onchange="
 sauvegarderEtatChecklist();
-envoyerChecklistFirebase();
 ">
 Course à pied
 </label>
@@ -512,7 +539,6 @@ Course à pied
 type="checkbox"
 onchange="
 sauvegarderEtatChecklist();
-envoyerChecklistFirebase();
 ">
 Golf
 </label>
@@ -568,8 +594,17 @@ Enceinte Bluetooth
 
 <button
 class="action btn-generate"
-onclick="genererListe()">
-🚀 Générer ma checklist
+onclick="genererChecklistEtReplier()">
+🚀 Générer ma checklist perso
+</button>
+
+<br><br>
+
+<button
+class="action"
+style="background:#28a745;"
+onclick="genererChecklistPartagee()">
+🌐 Générer la checklist partagée
 </button>
 
 <br><br>
@@ -591,12 +626,14 @@ onclick="partagerChecklist()">
 
 </div>
 
+</details>
+
 <div class="card">
 
 <h2>✅ Liste générée</h2>
 
 <div id="resultat">
-<p>Clique sur <b>Générer ma checklist</b>.</p>
+<p>Clique sur <b>Générer ma checklist perso</b>.</p>
 </div>
 
 </div>
@@ -783,6 +820,33 @@ Ajouter
 <h2>📦 Inventaire complet</h2>
 
 <div id="inventaireListe"></div>
+
+</div>
+
+</div>
+
+<div id="partageZone" style="display:none;">
+
+<div class="card">
+
+<h2>👨‍👩‍👧 Checklist familiale</h2>
+
+<div id="infosChecklistPartagee">
+</div>
+
+<br>
+
+<p>
+Cette checklist est partagée entre tous les appareils.
+</p>
+
+<div id="resultatPartage">
+
+<p>
+Aucune checklist partagée disponible.
+</p>
+
+</div>
 
 </div>
 
@@ -1553,14 +1617,19 @@ if(iris){
 html += `
 <div class="card">
 
-<h3>👶 Iris - Habits</h3>
+<details open>
+
+<summary>
+👶 Iris - Habits
+</summary>
+
+<div class="contenu-section">
 
 <label class="item">
 <input
 type="checkbox"
 onchange="
 sauvegarderEtatChecklist();
-envoyerChecklistFirebase();
 ">
 ${nbVetementsIris} bodys
 </label>
@@ -1570,7 +1639,6 @@ ${nbVetementsIris} bodys
 type="checkbox"
 onchange="
 sauvegarderEtatChecklist();
-envoyerChecklistFirebase();
 ">
 ${nbVetementsIris} tenues
 </label>
@@ -1580,7 +1648,6 @@ ${nbVetementsIris} tenues
 type="checkbox"
 onchange="
 sauvegarderEtatChecklist();
-envoyerChecklistFirebase();
 ">
 ${nbPyjamasIris} pyjamas
 </label>
@@ -1590,14 +1657,18 @@ ${nbPyjamasIris} pyjamas
 type="checkbox"
 onchange="
 sauvegarderEtatChecklist();
-envoyerChecklistFirebase();
 ">
 ${jours * 5} couches
 </label>
 
 </div>
+
+</details>
+
+</div>
 `;
 }
+
 
 // =======================
 // INVENTAIRE DE BASE
@@ -1636,7 +1707,6 @@ if(
     continue;
 }
 
-// on évite les doublons
 if(
 section === "👶 Iris - Habits"
 ){
@@ -1650,55 +1720,57 @@ if(
 ){
 
     html += `
-    <div class="card">
-    <h3>${section}</h3>
+<div class="card">
 
-    <label class="item">
-    <input
-type="checkbox"
-onchange="
-sauvegarderEtatChecklist();
-envoyerChecklistFirebase();
-">
-    ${nbVetementsAdultes} sous-vêtements
-    </label>
+<details open>
 
-    <label class="item">
-    <input
-type="checkbox"
-onchange="
-sauvegarderEtatChecklist();
-envoyerChecklistFirebase();
-">
-    ${nbVetementsAdultes} paires de chaussettes
-    </label>
+<summary>
+${section}
+</summary>
 
-    <label class="item">
-    <input
-type="checkbox"
-onchange="
-sauvegarderEtatChecklist();
-envoyerChecklistFirebase();
-">
-    ${nbVetementsAdultes} t-shirts
-    </label>
-
-    <label class="item">
-    <input
-type="checkbox"
-onchange="
-sauvegarderEtatChecklist();
-envoyerChecklistFirebase();
-">
-    ${nbPyjamasAdultes} pyjama${nbPyjamasAdultes > 1 ? "s" : ""}
-    </label>
+<div class="contenu-section">
 
 <label class="item">
 <input
 type="checkbox"
 onchange="
 sauvegarderEtatChecklist();
-envoyerChecklistFirebase();
+">
+${nbVetementsAdultes} sous-vêtements
+</label>
+
+<label class="item">
+<input
+type="checkbox"
+onchange="
+sauvegarderEtatChecklist();
+">
+${nbVetementsAdultes} paires de chaussettes
+</label>
+
+<label class="item">
+<input
+type="checkbox"
+onchange="
+sauvegarderEtatChecklist();
+">
+${nbVetementsAdultes} t-shirts
+</label>
+
+<label class="item">
+<input
+type="checkbox"
+onchange="
+sauvegarderEtatChecklist();
+">
+${nbPyjamasAdultes} pyjama${nbPyjamasAdultes > 1 ? "s" : ""}
+</label>
+
+<label class="item">
+<input
+type="checkbox"
+onchange="
+sauvegarderEtatChecklist();
 ">
 ${nbPulls} pull${nbPulls > 1 ? "s" : ""}
 </label>
@@ -1708,12 +1780,10 @@ ${nbPulls} pull${nbPulls > 1 ? "s" : ""}
 type="checkbox"
 onchange="
 sauvegarderEtatChecklist();
-envoyerChecklistFirebase();
 ">
 ${nbPantalons} pantalon${nbPantalons > 1 ? "s" : ""}
 </label>
-
-    `;
+`;
 
     inventaire[section].forEach(item=>{
 
@@ -1723,35 +1793,47 @@ ${nbPantalons} pantalon${nbPantalons > 1 ? "s" : ""}
             item === "T-shirts" ||
             item === "Pyjama" ||
             item === "Pull" ||
-item === "Pantalon"
+            item === "Pantalon"
         ){
             return;
         }
 
         html += `
-        <label class="item">
-        <input
+<label class="item">
+<input
 type="checkbox"
 onchange="
 sauvegarderEtatChecklist();
-envoyerChecklistFirebase();
 ">
-        ${item}
-        </label>
-        `;
+${item}
+</label>
+`;
     });
 
-    html += `</div>`;
+    html += `
+</div>
+
+</details>
+
+</div>
+`;
 
     continue;
 }
 
-html += `<div class="card">
-<h3>${section}</h3>`;
+html += `
+<div class="card">
 
-inventaire[section].forEach(
-(item,index)=>{
+<details open>
 
+<summary>
+${section}
+</summary>
+
+<div class="contenu-section">
+`;
+
+inventaire[section].forEach(item=>{
 
 html += `
 <label class="item">
@@ -1759,7 +1841,6 @@ html += `
 type="checkbox"
 onchange="
 sauvegarderEtatChecklist();
-envoyerChecklistFirebase();
 ">
 ${item}
 </label>
@@ -1767,7 +1848,13 @@ ${item}
 
 });
 
-html += `</div>`;
+html += `
+</div>
+
+</details>
+
+</div>
+`;
 
 }
 
@@ -1780,7 +1867,13 @@ if(typesVoyage[typeVoyage]){
 html += `
 <div class="card">
 
-<h3>🏕️ ${typeVoyage}</h3>
+<details open>
+
+<summary>
+🏕️ ${typeVoyage}
+</summary>
+
+<div class="contenu-section">
 `;
 
 typesVoyage[typeVoyage].forEach(item=>{
@@ -1791,7 +1884,6 @@ html += `
 type="checkbox"
 onchange="
 sauvegarderEtatChecklist();
-envoyerChecklistFirebase();
 ">
 ${item}
 </label>
@@ -1800,6 +1892,10 @@ ${item}
 });
 
 html += `
+</div>
+
+</details>
+
 </div>
 `;
 
@@ -1825,7 +1921,13 @@ if(!activites[nom]) return;
 html += `
 <div class="card">
 
-<h3>🎯 ${nom}</h3>
+<details open>
+
+<summary>
+🎯 ${nom}
+</summary>
+
+<div class="contenu-section">
 `;
 
 activites[nom].forEach(item=>{
@@ -1836,7 +1938,6 @@ html += `
 type="checkbox"
 onchange="
 sauvegarderEtatChecklist();
-envoyerChecklistFirebase();
 ">
 ${item}
 </label>
@@ -1845,6 +1946,10 @@ ${item}
 });
 
 html += `
+</div>
+
+</details>
+
 </div>
 `;
 
@@ -1876,16 +1981,15 @@ document
     affairesFacultatives[nom].forEach(item=>{
 
         htmlAffairesFacultatives += `
-        <label class="item">
-            <input
-            type="checkbox"
-            onchange="
+<label class="item">
+<input
+type="checkbox"
+onchange="
 sauvegarderEtatChecklist();
-envoyerChecklistFirebase();
 ">
-            ${item}
-        </label>
-        `;
+${item}
+</label>
+`;
 
     });
 
@@ -1894,14 +1998,24 @@ envoyerChecklistFirebase();
 if(htmlAffairesFacultatives){
 
     html += `
-    <div class="card">
+<div class="card">
 
-    <h3>⭐ Affaires facultatives</h3>
+<details open>
 
-    ${htmlAffairesFacultatives}
+<summary>
+⭐ Affaires facultatives
+</summary>
 
-    </div>
-    `;
+<div class="contenu-section">
+
+${htmlAffairesFacultatives}
+
+</div>
+
+</details>
+
+</div>
+`;
 }
 
 // =======================
@@ -1911,29 +2025,39 @@ if(htmlAffairesFacultatives){
 if(inventaire["🚗 Avant départ"]){
 
     html += `
-    <div class="card">
-    <h3>🚗 Avant départ</h3>
-    `;
+<div class="card">
+
+<details open>
+
+<summary>
+🚗 Avant départ
+</summary>
+
+<div class="contenu-section">
+`;
 
     inventaire["🚗 Avant départ"].forEach(item => {
 
         html += `
-        <label class="item">
-            <input
-            type="checkbox"
-            onchange="
+<label class="item">
+<input
+type="checkbox"
+onchange="
 sauvegarderEtatChecklist();
-envoyerChecklistFirebase();
 ">
-            ${item}
-        </label>
-        `;
+${item}
+</label>
+`;
 
     });
 
     html += `
-    </div>
-    `;
+</div>
+
+</details>
+
+</div>
+`;
 }
 
 // =======================
@@ -1942,6 +2066,8 @@ document.getElementById(
 "resultat"
 ).innerHTML = html;
 
+
+mettreAJourSections();
 
 localStorage.setItem(
     "checklistHTML",
@@ -1979,6 +2105,10 @@ function ouvrirOnglet(id){
 
 document.getElementById(
     "coursesZone"
+).style.display = "none";
+
+document.getElementById(
+    "partageZone"
 ).style.display = "none";
 
 document.getElementById(
@@ -2022,6 +2152,14 @@ else if(id === "inventaireZone"){
     .classList.add("active");
 
 }
+else if(id === "partageZone"){
+
+    document
+    .getElementById("btnPartage")
+    .classList.add("active");
+
+}
+
 else{
 
     document
@@ -2587,7 +2725,6 @@ function afficherCourses(){
 type="checkbox"
 onchange="
 sauvegarderEtatChecklist();
-envoyerChecklistFirebase();
 ">
 
 ${course}
@@ -3190,6 +3327,8 @@ function sauvegarderEtatChecklist(){
         JSON.stringify(etats)
     );
 
+    mettreAJourSections();
+
 }
 
 function restaurerEtatChecklist(){
@@ -3215,6 +3354,8 @@ function restaurerEtatChecklist(){
         etats[index] || false;
 
     });
+
+    mettreAJourSections();
 
 }
 
@@ -3312,7 +3453,15 @@ document.getElementById(
     document.getElementById(
         "resultat"
     ).innerHTML =
-    "<p>Clique sur <b>Générer ma checklist</b>.</p>";
+    "<p>Clique sur <b>Générer ma checklist perso</b>.</p>";
+
+    document.getElementById(
+    "detailsFavoris"
+).open = true;
+
+document.getElementById(
+    "detailsPreparation"
+).open = true;
 
 }
 
@@ -3500,37 +3649,6 @@ function reinitialiserFavoris(){
 
 }
 
-async function envoyerChecklistFirebase(){
-
-    const etats = [];
-
-    document
-    .querySelectorAll(
-        "#resultat input[type='checkbox']"
-    )
-    .forEach(cb => {
-
-        etats.push(
-            cb.checked
-        );
-
-    });
-
-    await setDoc(
-
-        doc(
-            db,
-            "checklists",
-            "famille"
-        ),
-
-        {
-            etat: etats
-        }
-
-    );
-
-}
 
 
 function ecouterChecklistFirebase(){
@@ -3543,26 +3661,101 @@ function ecouterChecklistFirebase(){
             "famille"
         ),
 
-        (snapshot) => {
+        (snapshot)=>{
 
             const data =
             snapshot.data();
+            let participants = [];
+
+if(data.participants?.aurore){
+    participants.push("👩 Aurore");
+}
+
+if(data.participants?.marc){
+    participants.push("👨 Marc");
+}
+
+if(data.participants?.iris){
+    participants.push("👶 Iris");
+}
+
+if(data.participants?.maya){
+    participants.push("🐱 Maya");
+}
+
+document.getElementById(
+    "infosChecklistPartagee"
+).innerHTML =
+`
+<p>
+<b>📍 Destination :</b>
+${data.destination || "-"}
+</p>
+
+<p>
+<b>📅 Durée :</b>
+${data.jours || "-"} jours
+</p>
+
+<p>
+<b>👨‍👩‍👧 Participants :</b>
+${participants.join(", ")}
+</p>
+
+<p>
+<b>👤 Créée par :</b>
+${data.createur || "-"}
+</p>
+
+<p>
+<b>🕒 Créée le :</b>
+${data.dateCreation || "-"}
+</p>
+`;
 
             if(!data){
                 return;
             }
 
-            document
-            .querySelectorAll(
-                "#resultat input[type='checkbox']"
-            )
-            .forEach((cb,index) => {
+            if(data.html){
 
-                cb.checked =
-                data.etat[index]
-                || false;
+                document.getElementById(
+                    "resultatPartage"
+                ).innerHTML =
+                data.html;
 
-            });
+                mettreAJourSections();
+
+                document
+                .querySelectorAll(
+                    "#resultatPartage input[type='checkbox']"
+                )
+                .forEach(cb => {
+
+                    cb.onchange = () => {
+
+                        envoyerChecklistPartageeFirebase();
+
+                    };
+
+                });
+
+            }
+
+            if(data.etat){
+
+                document
+                .querySelectorAll(
+                    "#resultatPartage input[type='checkbox']"
+                )
+                .forEach((cb,index)=>{
+
+                    cb.checked =
+                    data.etat[index] || false;
+
+                });
+
+            }
 
         }
 
@@ -3589,10 +3782,195 @@ async function testFirebase(){
 
 }
 
+async function genererChecklistPartagee(){
+
+    genererListe();
+
+    const html =
+    document.getElementById(
+        "resultat"
+    ).innerHTML;
+
+    const createur =
+prompt(
+    "Qui crée cette checklist ?",
+    "Marc"
+);
+
+    await setDoc(
+
+    doc(
+        db,
+        "checklists",
+        "famille"
+    ),
+
+    {
+
+        html: html,
+
+        destination:
+        document.getElementById(
+            "destination"
+        ).value,
+
+        jours:
+        document.getElementById(
+            "jours"
+        ).value,
+
+        dateCreation:
+        new Date().toLocaleString(),
+
+        createur: createur,
+
+        participants: {
+
+            aurore:
+            document.getElementById(
+                "participantAurore"
+            ).checked,
+
+            marc:
+            document.getElementById(
+                "participantMarc"
+            ).checked,
+
+            iris:
+            document.getElementById(
+                "participantIris"
+            ).checked,
+
+            maya:
+            document.getElementById(
+                "participantMaya"
+            ).checked
+
+        }
+
+    }
+
+);
+
+
+    alert(
+        "Checklist partagée créée ✅"
+    );
+
+}
+
+async function envoyerChecklistPartageeFirebase(){
+
+    const etats = [];
+
+    document
+    .querySelectorAll(
+        "#resultatPartage input[type='checkbox']"
+    )
+    .forEach(cb => {
+
+        etats.push(cb.checked);
+
+    });
+
+    await setDoc(
+
+        doc(
+            db,
+            "checklists",
+            "famille"
+        ),
+
+        {
+            etat: etats
+        },
+
+        {
+            merge: true
+        }
+
+    );
+
+}
+
+function mettreAJourSections(){
+
+    document
+    .querySelectorAll(
+        "#resultat details, #resultatPartage details"
+    )
+    .forEach(section => {
+
+        const cases =
+        section.querySelectorAll(
+            "input[type='checkbox']"
+        );
+
+        if(cases.length === 0){
+            return;
+        }
+
+        const cochees =
+        [...cases]
+        .filter(cb => cb.checked)
+        .length;
+
+        const total =
+        cases.length;
+
+        const summary =
+        section.querySelector(
+            "summary"
+        );
+
+        if(!summary.dataset.titre){
+
+            summary.dataset.titre =
+            summary.textContent.trim();
+
+        }
+
+        const titre =
+        summary.dataset.titre;
+
+        if(cochees === total){
+
+            summary.textContent =
+            `✅ ${titre} (${cochees}/${total})`;
+
+            section.removeAttribute("open");
+
+        }
+        else{
+
+            summary.textContent =
+            `📦 ${titre} (${cochees}/${total})`;
+
+        }
+
+    });
+
+}
+
+function genererChecklistEtReplier(){
+
+    genererListe();
+
+    document.getElementById(
+        "detailsFavoris"
+    ).open = false;
+
+    document.getElementById(
+        "detailsPreparation"
+    ).open = false;
+
+}
+
 Object.assign(window, {
     ouvrirOnglet,
     genererListe,
     reinitialiserChecklist,
+    genererChecklistEtReplier,
     partagerChecklist,
     sauvegarderFavori,
     chargerFavoriPerso,
@@ -3606,8 +3984,10 @@ Object.assign(window, {
     supprimerCourse,
     viderCourses,
     ajouterModelePerso,
-ajouterRecettePerso,
-sauvegarderEtatChecklist,
+    genererChecklistPartagee,
+    envoyerChecklistPartageeFirebase,
+    ajouterRecettePerso,
+    sauvegarderEtatChecklist,
     partagerCourses,
     afficherModele,
     afficherRecette,
@@ -3624,7 +4004,6 @@ sauvegarderEtatChecklist,
     gererTypeVoyage,
     gererMachineALaver,
     testFirebase,
-    envoyerChecklistFirebase
 });
 
 remplirListeCategories();
