@@ -1,4 +1,4 @@
-const CACHE_NAME = "assistant-voyage-v7";
+const CACHE_NAME = "assistant-voyage-v8";
 
 const urlsToCache = [
   "./",
