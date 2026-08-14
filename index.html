@@ -322,13 +322,19 @@ onclick="ouvrirOnglet('coursesZone')">
 <button
 id="btnPartage"
 onclick="ouvrirOnglet('partageZone')">
-👨‍👩‍👧 Checklit partagée
+👨‍👩‍👧 Checklist partagée
 </button>
 
 <button
 id="btnInventaire"
 onclick="ouvrirOnglet('inventaireZone')">
 📦 Inventaire
+</button>
+
+<button
+id="btnJeux"
+onclick="ouvrirOnglet('jeuxZone')">
+🎲 Jeux
 </button>
 
 <button
@@ -397,6 +403,14 @@ oninput="gererMachineALaver()">
 
 </div>
 
+<label>🌡️ Météo prévue</label>
+
+<select id="meteo">
+    <option value="tempere">Tempérée</option>
+    <option value="chaud">Chaud</option>
+    <option value="froid">Froid</option>
+</select>
+
 <h3 class="section-title">
 👨‍👩‍👧 Participants
 </h3>
@@ -436,41 +450,6 @@ id="participantMaya">
 
 </div>
 
-<div class="form-row">
-
-<div>
-
-<label>🏕️ Type de voyage</label>
-
-<select
-id="typeVoyage"
-onchange="gererTypeVoyage()">
-
-    <option>Week-end famille</option>
-    <option>Plage</option>
-    <option>Montagne</option>
-    <option>Ski</option>
-    <option>Camping</option>
-    <option>Travail</option>
-
-</select>
-
-</div>
-
-<div>
-
-<label>🌡️ Météo prévue</label>
-
-<select id="meteo">
-    <option value="tempere">Tempérée</option>
-    <option value="chaud">Chaud</option>
-    <option value="froid">Froid</option>
-</select>
-
-</div>
-
-</div>
-
 
 <h3 class="section-title">
 🎯 Activités prévues
@@ -487,6 +466,42 @@ onchange="
 sauvegarderEtatChecklist();
 ">
 Piscine
+</label>
+
+<label>
+<input
+type="checkbox"
+onchange="
+sauvegarderEtatChecklist();
+">
+Montagne
+</label>
+
+<label>
+<input
+type="checkbox"
+onchange="
+sauvegarderEtatChecklist();
+">
+Ski
+</label>
+
+<label>
+<input
+type="checkbox"
+onchange="
+sauvegarderEtatChecklist();
+">
+Camping
+</label>
+
+<label>
+<input
+type="checkbox"
+onchange="
+sauvegarderEtatChecklist();
+">
+Travail
 </label>
 
 <label>
@@ -852,6 +867,44 @@ Aucune checklist partagée disponible.
 
 </div>
 
+<div id="jeuxZone" style="display:none;">
+
+<div class="card">
+
+<h2>🎲 Jeux de société</h2>
+
+<div
+id="listeJeux"
+style="
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:10px;
+">
+</div>
+
+<br>
+
+<button
+class="action"
+onclick="afficherStatistiquesJeux()">
+
+🏆 Résultats et statistiques
+
+</button>
+
+<button
+class="action"
+style="background:#dc3545;"
+onclick="reinitialiserScoresJeux()">
+🗑️ Réinitialiser les scores
+</button>
+
+</div>
+
+<div id="zoneJeu"></div>
+
+</div>
+
 <div id="adminZone" style="display:none;">
 
 <div class="card">
@@ -932,7 +985,8 @@ import {
     getFirestore,
     doc,
     setDoc,
-    onSnapshot
+    onSnapshot,
+    getDoc
 }
 from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
@@ -955,15 +1009,13 @@ const inventaireDefaut = {
 
 "👶 Iris - Route":[
 "Change rapide",
-"Tapis à langer portable",
-"Couches",
-"Lingettes",
-"Crème change",
-"Coton",
-"Eau",
+"Tapis à langer nomade (complet !)",
+"Gourde TumTum",
+"Evian",
 "Body secours",
 "Tenue complète secours",
 "Biberon prêt",
+"Dosette lait en poudre",
 "Chauffe biberon nomade",
 "Bavoir",
 "Cuillère",
@@ -1008,10 +1060,11 @@ const inventaireDefaut = {
 "Biberons",
 "Goupillon",
 "Bavoir",
-"Gourde Tum Tum",
+"Huile bébé",
 "Cuillère",
 "Bol bébé",
 "Assiette bébé",
+"Gant de toilette",
 "Petits pots",
 "Compotes",
 "Lait en poudre"
@@ -1033,6 +1086,8 @@ const inventaireDefaut = {
 "🚼 Iris - Sorties":[
 "Poussette",
 "Porte bébé",
+"Chaise haute nomade",
+"Jouets",
 "Bob",
 "Crème solaire",
 "Lunettes de soleil",
@@ -1045,6 +1100,9 @@ const inventaireDefaut = {
 "Clés",
 "Ipad",
 "Jeux de sociétés",
+"Chèques vacances",
+"Anti-moustiques",
+"Défroisseur",
 "Glacière decathlon"
 ],
 
@@ -1058,6 +1116,7 @@ const inventaireDefaut = {
 "Birkenstock",
 "Téléphone",
 "Chargeur téléphone",
+"Montre + chargeur garmin",
 "Papier d'identité",
 "Lunettes de soleil",
 "Airpod",
@@ -1083,7 +1142,7 @@ const inventaireDefaut = {
 "Chargeur téléphone",
 "Porte carte",
 "Lunettes de soleil",
-"Montre",
+"Montre + chargeur",
 "Trousse de toilette",
 "Coupe ongles",
 "Airpod",
@@ -1102,6 +1161,7 @@ const inventaireDefaut = {
 
 "🚗 Avant départ":[
 "Vider les poubelles",
+"Vider bac à café",
 "Arroser les plantes",
 "Nourrir Maya",
 "Fermer les fenêtres",
@@ -1129,6 +1189,88 @@ JSON.parse(
 JSON.stringify(inventaireDefaut)
 );
 
+const jeuxSociete = [
+
+"Aventuriers du Rail",
+"Yams",
+"Backgammon",
+
+"Château Combo",
+"Boop",
+"Dewan",
+
+"Toy Battle",
+"Shotten Totten",
+"Rami",
+
+"Azul",
+"Good Fortune",
+"Sea Salt and Paper",
+
+"Tic Tac Trek",
+"Speed",
+"Scopa"
+
+];
+
+let historiqueJeux =
+JSON.parse(
+localStorage.getItem(
+"historiqueJeux"
+))
+||
+[];
+
+let statistiquesJeux =
+JSON.parse(
+localStorage.getItem(
+"statistiquesJeux"
+))
+||
+{
+    global:{
+        Marc:{
+            victoires:0,
+            defaites:0,
+            nuls:0
+        },
+        Aurore:{
+            victoires:0,
+            defaites:0,
+            nuls:0
+        }
+    },
+
+    jeux:{}
+};
+
+for(const jeu of jeuxSociete){
+
+    if(!statistiquesJeux.jeux[jeu]){
+
+        statistiquesJeux.jeux[jeu] = {
+
+            Marc:{
+                victoires:0,
+                defaites:0,
+                nuls:0
+            },
+
+            Aurore:{
+                victoires:0,
+                defaites:0,
+                nuls:0
+            },
+
+            meilleurScore:null,
+            recordman:null
+
+        };
+
+    }
+
+}
+
 let favoris =
 JSON.parse(
 localStorage.getItem("favoris")
@@ -1142,7 +1284,6 @@ localStorage.getItem("favoris")
     participantAurore:true,
     participantMarc:true,
     participantIris:true,
-    typeVoyage:"Week-end famille",
     activites:[]
 },
 
@@ -1152,7 +1293,6 @@ localStorage.getItem("favoris")
     participantAurore:true,
     participantMarc:true,
     participantIris:true,
-    typeVoyage:"Montagne",
     activites:["Randonnée"]
 },
 
@@ -1162,7 +1302,6 @@ localStorage.getItem("favoris")
     participantAurore:true,
     participantMarc:true,
     participantIris:true,
-    typeVoyage:"Week-end famille",
     activites:["Piscine"]
 },
 
@@ -1173,7 +1312,6 @@ localStorage.getItem("favoris")
     participantMarc:true,
     participantIris:true,
     participantMaya:false,
-    typeVoyage:"Plage",
     activites:[
         "Surf",
         "Plage"
@@ -1184,7 +1322,19 @@ localStorage.getItem("favoris")
 
 };
 
-const typesVoyage = {
+const activites = {
+
+"Piscine":[
+"Maillot de bain",
+"Serviette",
+"Claquettes"
+],
+
+"Randonnée":[
+"Chaussures randonnée",
+"Gourde",
+"Sac à dos randonnée"
+],
 
 "Ski":[
 "Pantalon de ski",
@@ -1221,30 +1371,16 @@ const typesVoyage = {
 "Plage":[
 "Parasol",
 "Serviette plage",
+"Grosse couverture rayée plage",
 "Chaussures Vatalo",
 "Sac Hoallen",
+"Fouta",
 "Crème solaire"
 ],
 
 "Travail":[
 "Ordinateur portable",
 "Chargeur PC"
-]
-
-};
-
-const activites = {
-
-"Piscine":[
-"Maillot de bain",
-"Serviette",
-"Claquettes"
-],
-
-"Randonnée":[
-"Chaussures randonnée",
-"Gourde",
-"Sac à dos randonnée"
 ],
 
 "Vélo":[
@@ -1261,14 +1397,6 @@ const activites = {
 "Bob surf",
 "Crème solaire",
 "Ponchos surf"
-],
-
-"Plage":[
-"Casquette",
-"Lunettes de soleil",
-"Parasol",
-"Fouta",
-"Serviette plage"
 ],
 
 "Course à pied":[
@@ -1449,7 +1577,7 @@ ${section}
 <button
 onclick="
 supprimerCategorie(
-'${section}'
+${JSON.stringify(section)}
 )
 ">
 🗑️
@@ -1470,7 +1598,7 @@ ${item}
 <button
 onclick="
 modifierObjet(
-'${section}',
+${JSON.stringify(section)},
 ${index}
 )
 ">
@@ -1480,7 +1608,7 @@ ${index}
 <button
 onclick="
 supprimerObjet(
-'${section}',
+${JSON.stringify(section)},
 ${index}
 )
 ">
@@ -1548,9 +1676,6 @@ document.getElementById(
 
 const meteo =
 document.getElementById("meteo").value;
-
-const typeVoyage =
-document.getElementById("typeVoyage").value;
 
 const jours =
 parseInt(
@@ -1859,49 +1984,6 @@ html += `
 }
 
 // =======================
-// TYPE DE VOYAGE
-// =======================
-
-if(typesVoyage[typeVoyage]){
-
-html += `
-<div class="card">
-
-<details open>
-
-<summary>
-🏕️ ${typeVoyage}
-</summary>
-
-<div class="contenu-section">
-`;
-
-typesVoyage[typeVoyage].forEach(item=>{
-
-html += `
-<label class="item">
-<input
-type="checkbox"
-onchange="
-sauvegarderEtatChecklist();
-">
-${item}
-</label>
-`;
-
-});
-
-html += `
-</div>
-
-</details>
-
-</div>
-`;
-
-}
-
-// =======================
 // ACTIVITES
 // =======================
 
@@ -2062,6 +2144,27 @@ ${item}
 
 // =======================
 
+html += `
+
+<div class="card">
+
+<button
+class="action"
+style="
+background:#28a745;
+font-size:22px;
+font-weight:bold;
+"
+onclick="verifierPretADepart()">
+
+✅ PRÊT À PARTIR ?
+
+</button>
+
+</div>
+
+`;
+
 document.getElementById(
 "resultat"
 ).innerHTML = html;
@@ -2080,17 +2183,14 @@ function chargerFavori(type){
 
 if(type==="plv"){
 document.getElementById("jours").value=2;
-document.getElementById("typeVoyage").value="Week-end famille";
 }
 
 if(type==="vosges"){
 document.getElementById("jours").value=3;
-document.getElementById("typeVoyage").value="Montagne";
 }
 
 if(type==="copains"){
 document.getElementById("jours").value=2;
-document.getElementById("typeVoyage").value="Week-end famille";
 }
 
 genererListe();
@@ -2113,6 +2213,10 @@ document.getElementById(
 
 document.getElementById(
     "inventaireZone"
+).style.display = "none";
+
+document.getElementById(
+    "jeuxZone"
 ).style.display = "none";
 
 document.getElementById(
@@ -2149,6 +2253,13 @@ else if(id === "inventaireZone"){
 
     document
     .getElementById("btnInventaire")
+    .classList.add("active");
+
+}
+else if(id === "jeuxZone"){
+
+    document
+    .getElementById("btnJeux")
     .classList.add("active");
 
 }
@@ -2418,11 +2529,6 @@ document.getElementById(
 ).checked,
 
 
-        typeVoyage:
-        document.getElementById(
-            "typeVoyage"
-        ).value,
-
         activites:
         activitesSelectionnees
 
@@ -2461,7 +2567,7 @@ background:white;
             style="flex:1"
             onclick="
             chargerFavoriPerso(
-            '${nom}'
+            ${JSON.stringify(nom)}
             )
             ">
             ⭐ ${nom}
@@ -2470,7 +2576,7 @@ background:white;
             <button
             onclick="
             supprimerFavori(
-            '${nom}'
+            ${JSON.stringify(nom)}
             )
             ">
             ❌
@@ -2527,12 +2633,6 @@ document
     "participantMaya"
 ).checked =
 favori.participantMaya ?? false;
-
-    document
-    .getElementById(
-        "typeVoyage"
-    ).value =
-    favori.typeVoyage;
 
    document
 .querySelectorAll(
@@ -2633,16 +2733,16 @@ async function partagerChecklist(){
     .querySelectorAll("#resultat .card")
     .forEach(carte=>{
 
-        const titre =
-        carte.querySelector("h3");
+      const titre =
+carte.querySelector("summary");
 
-        if(titre){
+if(titre){
 
-            texte += "\n";
-            texte += titre.textContent;
-            texte += "\n";
+    texte += "\n";
+    texte += titre.textContent;
+    texte += "\n";
 
-        }
+}
 
         carte
         .querySelectorAll(".item")
@@ -3388,12 +3488,6 @@ function reinitialiserChecklist(){
         "jours"
     ).value = 3;
 
-    // Voyage
-    document.getElementById(
-        "typeVoyage"
-    ).value =
-    "Week-end famille";
-
     // Météo
     document.getElementById(
         "meteo"
@@ -3481,35 +3575,7 @@ if(checklistSauvegardee){
 
 }
 
-function gererTypeVoyage(){
 
-    const typeVoyage =
-    document.getElementById(
-        "typeVoyage"
-    ).value;
-
-    document
-    .querySelectorAll(
-        "#activitesZone input[type='checkbox']"
-    )
-    .forEach(cb=>{
-
-        const activite =
-        cb.parentElement.textContent.trim();
-
-        if(activite === "Plage"){
-
-            if(typeVoyage === "Plage"){
-
-                cb.checked = true;
-
-            }
-
-        }
-
-    });
-
-}
 
 function reinitialiserApplication(){
 
@@ -3599,7 +3665,6 @@ function reinitialiserFavoris(){
             participantAurore:true,
             participantMarc:true,
             participantIris:true,
-            typeVoyage:"Week-end famille",
             activites:[]
         },
 
@@ -3609,7 +3674,6 @@ function reinitialiserFavoris(){
             participantAurore:true,
             participantMarc:true,
             participantIris:true,
-            typeVoyage:"Montagne",
             activites:["Randonnée"]
         },
 
@@ -3619,7 +3683,6 @@ function reinitialiserFavoris(){
             participantAurore:true,
             participantMarc:true,
             participantIris:true,
-            typeVoyage:"Week-end famille",
             activites:["Piscine"]
         },
 
@@ -3630,7 +3693,6 @@ function reinitialiserFavoris(){
             participantMarc:true,
             participantIris:true,
             participantMaya:false,
-            typeVoyage:"Plage",
             activites:[
                 "Surf",
                 "Plage"
@@ -3664,8 +3726,13 @@ function ecouterChecklistFirebase(){
         (snapshot)=>{
 
             const data =
-            snapshot.data();
-            let participants = [];
+snapshot.data();
+
+if(!data){
+    return;
+}
+
+let participants = [];
 
 if(data.participants?.aurore){
     participants.push("👩 Aurore");
@@ -3713,16 +3780,35 @@ ${data.dateCreation || "-"}
 </p>
 `;
 
-            if(!data){
-                return;
-            }
 
             if(data.html){
 
                 document.getElementById(
-                    "resultatPartage"
-                ).innerHTML =
-                data.html;
+"resultatPartage"
+).innerHTML =
+
+data.html +
+
+`
+
+<div class="card">
+
+<button
+class="action"
+style="
+background:#28a745;
+font-size:22px;
+font-weight:bold;
+"
+onclick="verifierPretADepartPartage()">
+
+✅ PRÊT À PARTIR ?
+
+</button>
+
+</div>
+
+`;
 
                 mettreAJourSections();
 
@@ -3734,9 +3820,11 @@ ${data.dateCreation || "-"}
 
                     cb.onchange = () => {
 
-                        envoyerChecklistPartageeFirebase();
+    mettreAJourSections();
 
-                    };
+    envoyerChecklistPartageeFirebase();
+
+};
 
                 });
 
@@ -3754,6 +3842,8 @@ ${data.dateCreation || "-"}
                     data.etat[index] || false;
 
                 });
+
+                mettreAJourSections();
 
             }
 
@@ -3893,6 +3983,93 @@ async function envoyerChecklistPartageeFirebase(){
 
 }
 
+async function envoyerJeuxFirebase(){
+
+    await setDoc(
+
+        doc(
+            db,
+            "jeux",
+            "statistiques"
+        ),
+
+        {
+
+            historiqueJeux:
+            historiqueJeux,
+
+            statistiquesJeux:
+            statistiquesJeux
+
+        }
+
+    );
+
+}
+
+function ecouterJeuxFirebase(){
+
+    onSnapshot(
+
+        doc(
+            db,
+            "jeux",
+            "statistiques"
+        ),
+
+        (snapshot)=>{
+
+            const data =
+            snapshot.data();
+
+            if(!data){
+                return;
+            }
+
+            historiqueJeux =
+            data.historiqueJeux || [];
+
+            statistiquesJeux =
+            data.statistiquesJeux || {
+
+                global:{
+                    Marc:{
+                        victoires:0,
+                        defaites:0,
+                        nuls:0
+                    },
+
+                    Aurore:{
+                        victoires:0,
+                        defaites:0,
+                        nuls:0
+                    }
+                },
+
+                jeux:{}
+
+            };
+
+            localStorage.setItem(
+                "historiqueJeux",
+                JSON.stringify(
+                    historiqueJeux
+                )
+            );
+
+            localStorage.setItem(
+                "statistiquesJeux",
+                JSON.stringify(
+                    statistiquesJeux
+                )
+            );
+
+        }
+
+    );
+
+}
+
 function mettreAJourSections(){
 
     document
@@ -3966,8 +4143,687 @@ function genererChecklistEtReplier(){
 
 }
 
+function ouvrirJeu(jeu){
+
+document.getElementById(
+"zoneJeu"
+).innerHTML =
+
+`
+<div class="card">
+
+<h2>
+🎲 ${jeu}
+</h2>
+
+<label>
+Résultat
+</label>
+
+<select id="resultatPartie">
+
+<option value="Marc">
+👨 Marc gagne
+</option>
+
+<option value="Aurore">
+👩 Aurore gagne
+</option>
+
+<option value="nul">
+🤝 Match nul
+</option>
+
+</select>
+
+<label>👨 Marc</label>
+
+<input
+type="number"
+id="scoreMarc"
+placeholder="Score Marc">
+
+<label>👩 Aurore</label>
+
+<input
+type="number"
+id="scoreAurore"
+placeholder="Score Aurore">
+
+<button
+class="action"
+onclick="enregistrerPartieSociete('${jeu}')">
+
+✅ Enregistrer la partie
+
+</button>
+
+</div>
+`;
+
+}
+
+
+
+
+
+
+function verifierPretADepart(){
+
+const oublis = [];
+
+document
+.querySelectorAll(
+"#resultat details"
+)
+.forEach(section=>{
+
+const titre =
+section.querySelector(
+"summary"
+).dataset.titre
+||
+section.querySelector(
+"summary"
+).textContent;
+
+section
+.querySelectorAll(
+"label.item"
+)
+.forEach(item=>{
+
+const cb =
+item.querySelector(
+"input[type='checkbox']"
+);
+
+if(cb && !cb.checked){
+
+oublis.push(
+`${titre} ➜ ${item.textContent.trim()}`
+);
+
+}
+
+});
+
+});
+
+if(oublis.length === 0){
+
+alert(
+
+`✅ Tout est prêt !
+
+Dernier rappel avant départ :
+
+• Téléphones
+• Portefeuille
+• Papiers d'identité
+• Clés voiture
+• Clés logement
+• Gourdes remplies
+• Doudou Iris
+• Biberon Iris
+• Alarme activée
+
+🚗 Bon voyage !`
+
+);
+
+return;
+
+}
+
+alert(
+
+`⚠️ Attention !
+
+Il reste ${oublis.length} élément(s) non préparé(s) :
+
+\n\n${oublis.join("\n")}`
+
+);
+
+}
+
+function verifierPretADepartPartage(){
+
+const oublis = [];
+
+document
+.querySelectorAll(
+"#resultatPartage details"
+)
+.forEach(section=>{
+
+const titre =
+section.querySelector(
+"summary"
+).dataset.titre
+||
+section.querySelector(
+"summary"
+).textContent;
+
+section
+.querySelectorAll(
+"label.item"
+)
+.forEach(item=>{
+
+const cb =
+item.querySelector(
+"input[type='checkbox']"
+);
+
+if(cb && !cb.checked){
+
+oublis.push(
+`${titre} ➜ ${item.textContent.trim()}`
+);
+
+}
+
+});
+
+});
+
+if(oublis.length === 0){
+
+alert(
+
+`✅ Tout est prêt !
+
+Dernier rappel avant départ :
+
+• Téléphones
+• Portefeuille
+• Papiers d'identité
+• Clés voiture
+• Clés logement
+• Gourdes remplies
+• Doudou Iris
+• Biberon Iris
+• Alarme activée
+
+🚗 Bon voyage !`
+
+);
+
+return;
+
+}
+
+alert(
+
+`⚠️ Attention !
+
+Il reste ${oublis.length} élément(s) non préparé(s) :
+
+\n\n${oublis.join("\n")}`
+
+);
+
+}
+
+function ouvrirSuiviJeux(){
+
+document.getElementById(
+"zoneJeu"
+).innerHTML =
+
+`
+<div class="card">
+
+<h2>
+🏆 Duel Marc vs Aurore
+</h2>
+
+<label>Jeu</label>
+
+<input
+id="nomJeuSociete"
+placeholder="Ex : Skyjo">
+
+<label>Résultat</label>
+
+<select id="resultatPartie">
+
+<option value="Marc">
+👨 Marc gagne
+</option>
+
+<option value="Aurore">
+👩 Aurore gagne
+</option>
+
+<option value="nul">
+🤝 Match nul
+</option>
+
+</select>
+
+<button
+class="action"
+onclick="enregistrerPartieSociete()">
+
+✅ Enregistrer
+
+</button>
+
+</div>
+`;
+}
+
+function enregistrerPartieSociete(jeu){
+
+const resultat =
+document.getElementById(
+"resultatPartie"
+).value;
+
+const scoreMarc =
+parseInt(
+    document.getElementById("scoreMarc").value
+) || 0;
+
+const scoreAurore =
+parseInt(
+    document.getElementById("scoreAurore").value
+) || 0;
+
+const meilleurScorePartie =
+Math.max(
+    scoreMarc,
+    scoreAurore
+);
+
+const recordman =
+scoreMarc > scoreAurore
+? "Marc"
+: scoreAurore > scoreMarc
+? "Aurore"
+: "Égalité";
+
+if(
+    !statistiquesJeux.jeux[jeu].meilleurScore ||
+    meilleurScorePartie >
+    statistiquesJeux.jeux[jeu].meilleurScore
+){
+
+    statistiquesJeux.jeux[jeu].meilleurScore =
+    meilleurScorePartie;
+
+    statistiquesJeux.jeux[jeu].recordman =
+    recordman;
+
+}
+
+if(resultat === "Marc"){
+
+statistiquesJeux.global.Marc.victoires++;
+statistiquesJeux.global.Aurore.defaites++;
+
+statistiquesJeux.jeux[jeu].Marc.victoires++;
+statistiquesJeux.jeux[jeu].Aurore.defaites++;
+
+}
+
+else if(resultat === "Aurore"){
+
+statistiquesJeux.global.Aurore.victoires++;
+statistiquesJeux.global.Marc.defaites++;
+
+statistiquesJeux.jeux[jeu].Aurore.victoires++;
+statistiquesJeux.jeux[jeu].Marc.defaites++;
+
+}
+
+else{
+
+statistiquesJeux.global.Marc.nuls++;
+statistiquesJeux.global.Aurore.nuls++;
+
+statistiquesJeux.jeux[jeu].Marc.nuls++;
+statistiquesJeux.jeux[jeu].Aurore.nuls++;
+
+}
+
+historiqueJeux.push({
+
+jeu,
+
+resultat,
+
+scoreMarc,
+scoreAurore,
+
+date:
+new Date().toLocaleString()
+
+});
+
+localStorage.setItem(
+"historiqueJeux",
+JSON.stringify(historiqueJeux)
+);
+
+localStorage.setItem(
+"statistiquesJeux",
+JSON.stringify(statistiquesJeux)
+);
+
+envoyerJeuxFirebase();
+
+alert(
+"Partie enregistrée ✅"
+);
+
+}
+
+function afficherStatistiquesDuel(){
+
+let html =
+
+`
+<div class="card">
+
+<h2>
+🏆 Statistiques générales
+</h2>
+
+<p>
+👨 Marc :
+${statistiquesJeux.global.Marc.victoires} V /
+${statistiquesJeux.global.Marc.defaites} D /
+${statistiquesJeux.global.Marc.nuls} N
+</p>
+
+<p>
+👩 Aurore :
+${statistiquesJeux.global.Aurore.victoires} V /
+${statistiquesJeux.global.Aurore.defaites} D /
+${statistiquesJeux.global.Aurore.nuls} N
+</p>
+
+<hr>
+
+<h2>
+🎲 Par jeu
+</h2>
+`;
+
+for(const jeu in statistiquesJeux.jeux){
+
+html +=
+
+`
+<h3>
+${jeu}
+</h3>
+
+<p>
+🏅 Record :
+${statistiquesJeux.jeux[jeu].meilleurScore ?? "-"}
+ pts
+(
+${statistiquesJeux.jeux[jeu].recordman ?? "-"}
+)
+</p>
+
+<p>
+👨 Marc :
+${statistiquesJeux.jeux[jeu].Marc.victoires} victoire(s)
+</p>
+
+<p>
+👩 Aurore :
+${statistiquesJeux.jeux[jeu].Aurore.victoires} victoire(s)
+</p>
+`;
+}
+
+html += `
+</div>
+`;
+
+document.getElementById(
+"zoneJeu"
+).innerHTML = html;
+
+}
+
+function afficherStatistiquesJeux(){
+
+const totalPartiesGlobales =
+statistiquesJeux.global.Marc.victoires +
+statistiquesJeux.global.Aurore.victoires +
+statistiquesJeux.global.Marc.nuls;
+
+const pourcentageMarc =
+totalPartiesGlobales > 0
+? (
+    statistiquesJeux.global.Marc.victoires
+    / totalPartiesGlobales * 100
+).toFixed(1)
+: 0;
+
+const pourcentageAurore =
+totalPartiesGlobales > 0
+? (
+    statistiquesJeux.global.Aurore.victoires
+    / totalPartiesGlobales * 100
+).toFixed(1)
+: 0;
+
+let html =
+
+`
+<div class="card">
+
+<h2>
+🏆 Résultats globaux
+</h2>
+
+<p>
+👨 Marc :
+${statistiquesJeux.global.Marc.victoires} victoire(s)
+(${pourcentageMarc}%)
+</p>
+
+<p>
+👩 Aurore :
+${statistiquesJeux.global.Aurore.victoires} victoire(s)
+(${pourcentageAurore}%)
+</p>
+
+<p>
+🤝 Matchs nuls :
+${statistiquesJeux.global.Marc.nuls}
+</p>
+
+<hr>
+
+<h2>
+🎲 Détail par jeu
+</h2>
+`;
+
+const jeuxTriesStatistiques =
+[...jeuxSociete]
+.sort((a,b)=>{
+
+    const partiesA =
+        historiqueJeux.filter(
+            p => p.jeu === a
+        ).length;
+
+    const partiesB =
+        historiqueJeux.filter(
+            p => p.jeu === b
+        ).length;
+
+    return partiesB - partiesA;
+
+});
+
+for(const jeu of jeuxTriesStatistiques){
+
+    const nbParties =
+historiqueJeux.filter(
+    p => p.jeu === jeu
+).length;
+
+
+    const totalPartiesJeu =
+    statistiquesJeux.jeux[jeu].Marc.victoires +
+    statistiquesJeux.jeux[jeu].Aurore.victoires +
+    statistiquesJeux.jeux[jeu].Marc.nuls;
+
+const pourcentageMarcJeu =
+    totalPartiesJeu > 0
+    ? (
+        statistiquesJeux.jeux[jeu].Marc.victoires
+        / totalPartiesJeu * 100
+    ).toFixed(1)
+    : 0;
+
+const pourcentageAuroreJeu =
+    totalPartiesJeu > 0
+    ? (
+        statistiquesJeux.jeux[jeu].Aurore.victoires
+        / totalPartiesJeu * 100
+    ).toFixed(1)
+    : 0;
+
+html +=
+
+`
+<h3>
+${jeu}
+(${nbParties} partie${nbParties > 1 ? "s" : ""})
+</h3>
+
+<p>
+🏅 Meilleur score :
+${statistiquesJeux.jeux[jeu].meilleurScore ?? "-"}
+ pts
+(
+${statistiquesJeux.jeux[jeu].recordman ?? "-"}
+)
+</p>
+
+<p>
+
+👨 Marc :
+${statistiquesJeux.jeux[jeu].Marc.victoires}
+ (${pourcentageMarcJeu}%)
+
+|
+
+👩 Aurore :
+${statistiquesJeux.jeux[jeu].Aurore.victoires}
+ (${pourcentageAuroreJeu}%)
+
+|
+
+🤝
+${statistiquesJeux.jeux[jeu].Marc.nuls}
+
+</p>
+`;
+}
+
+html += "</div>";
+
+document.getElementById(
+"zoneJeu"
+).innerHTML = html;
+
+}
+
+function reinitialiserScoresJeux(){
+
+    if(
+        !confirm(
+            "Supprimer tous les résultats et statistiques ?"
+        )
+    ){
+        return;
+    }
+
+    historiqueJeux = [];
+
+    statistiquesJeux = {
+        global:{
+            Marc:{
+                victoires:0,
+                defaites:0,
+                nuls:0
+            },
+            Aurore:{
+                victoires:0,
+                defaites:0,
+                nuls:0
+            }
+        },
+        jeux:{}
+    };
+
+    for(const jeu of jeuxSociete){
+
+        statistiquesJeux.jeux[jeu] = {
+
+            Marc:{
+                victoires:0,
+                defaites:0,
+                nuls:0
+            },
+
+            Aurore:{
+                victoires:0,
+                defaites:0,
+                nuls:0
+            },
+
+            meilleurScore:null,
+            recordman:null
+
+        };
+
+    }
+
+    localStorage.setItem(
+        "historiqueJeux",
+        JSON.stringify(historiqueJeux)
+    );
+
+    localStorage.setItem(
+        "statistiquesJeux",
+        JSON.stringify(statistiquesJeux)
+    );
+
+    envoyerJeuxFirebase();
+
+    alert(
+        "Statistiques réinitialisées ✅"
+    );
+
+}
+
+
 Object.assign(window, {
     ouvrirOnglet,
+    ouvrirSuiviJeux,
+    enregistrerPartieSociete,
+    reinitialiserScoresJeux,
+    afficherStatistiquesDuel,
+    ouvrirJeu,
+    afficherStatistiquesJeux,
+    verifierPretADepart,
+    verifierPretADepartPartage,
     genererListe,
     reinitialiserChecklist,
     genererChecklistEtReplier,
@@ -4001,7 +4857,6 @@ Object.assign(window, {
     reinitialiserFavoris,
     reinitialiserApplication,
     exporterDonneesCompletes,
-    gererTypeVoyage,
     gererMachineALaver,
     testFirebase,
 });
@@ -4011,9 +4866,59 @@ afficherInventaire();
 afficherFavoris();
 afficherCourses();
 
+let htmlJeux = "";
+
+const jeuxTries = [...jeuxSociete].sort((a,b)=>{
+
+    const partiesA =
+    historiqueJeux.filter(
+        p => p.jeu === a
+    ).length;
+
+    const partiesB =
+    historiqueJeux.filter(
+        p => p.jeu === b
+    ).length;
+
+    return partiesB - partiesA;
+
+});
+
+jeuxTries.forEach(jeu=>{
+
+    const nbParties =
+    historiqueJeux.filter(
+        p => p.jeu === jeu
+    ).length;
+
+    htmlJeux += `
+
+    <button
+    class="action"
+    onclick="ouvrirJeu('${jeu}')">
+
+    ${jeu}
+    <br>
+    <small>
+    ${nbParties} partie(s)
+    </small>
+
+    </button>
+
+    `;
+
+});
+
+
+document.getElementById(
+"listeJeux"
+).innerHTML = htmlJeux;
+
 ouvrirOnglet("voyageZone");
 
 ecouterChecklistFirebase();
+ecouterJeuxFirebase();
+
 
 
 
