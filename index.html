@@ -131,13 +131,7 @@ button{
     border-radius:10px;
     transition:0.2s;
 }
-    color:white;
-    font-size:16px;
-    font-weight:bold;
-    border:1px solid rgba(255,255,255,0.5);
-    border-radius:10px;
-    transition:0.2s;
-}
+
 
 .tabs button:hover{
     background:rgba(255,255,255,0.3);
@@ -903,17 +897,10 @@ gap:10px;
 
 <button
 class="action"
-onclick="afficherStatistiquesJeux()">
+onclick="afficherstats()">
 
 🏆 Résultats et statistiques
 
-</button>
-
-<button
-class="action"
-style="background:#dc3545;"
-onclick="reinitialiserScoresJeux()">
-🗑️ Réinitialiser les scores
 </button>
 
 </div>
@@ -961,6 +948,25 @@ class="action"
 onclick="synchroniserCourses()">
 🔄 Synchroniser les recettes
 </button>
+
+<hr>
+
+<h3>🎲 Jeux</h3>
+
+<button
+class="action"
+onclick="afficherHistoriqueJeuxAdmin()">
+📋 Historique des parties
+</button>
+
+<button
+class="action"
+style="background:#dc3545;"
+onclick="reinitialiserScoresJeux()">
+🗑️ Réinitialiser les scores
+</button>
+
+<div id="adminJeuxZone"></div>
 
 <hr>
 
@@ -1238,10 +1244,10 @@ localStorage.getItem(
 ||
 [];
 
-let statistiquesJeux =
+let stats =
 JSON.parse(
 localStorage.getItem(
-"statistiquesJeux"
+"stats"
 ))
 ||
 {
@@ -1263,9 +1269,9 @@ localStorage.getItem(
 
 for(const jeu of jeuxSociete){
 
-    if(!statistiquesJeux.jeux[jeu]){
+    if(!stats.jeux[jeu]){
 
-        statistiquesJeux.jeux[jeu] = {
+        stats.jeux[jeu] = {
 
             Marc:{
                 victoires:0,
@@ -4015,8 +4021,8 @@ async function envoyerJeuxFirebase(){
             historiqueJeux:
             historiqueJeux,
 
-            statistiquesJeux:
-            statistiquesJeux
+            stats:
+            stats
 
         }
 
@@ -4046,8 +4052,8 @@ function ecouterJeuxFirebase(){
             historiqueJeux =
             data.historiqueJeux || [];
 
-            statistiquesJeux =
-            data.statistiquesJeux || {
+            stats =
+            data.stats || {
 
                 global:{
                     Marc:{
@@ -4067,6 +4073,33 @@ function ecouterJeuxFirebase(){
 
             };
 
+            for(const jeu of jeuxSociete){
+
+    if(!stats.jeux[jeu]){
+
+        stats.jeux[jeu] = {
+
+            Marc:{
+                victoires:0,
+                defaites:0,
+                nuls:0
+            },
+
+            Aurore:{
+                victoires:0,
+                defaites:0,
+                nuls:0
+            },
+
+            meilleurScore:null,
+            recordman:null
+
+        };
+
+    }
+
+}
+
             localStorage.setItem(
                 "historiqueJeux",
                 JSON.stringify(
@@ -4075,9 +4108,9 @@ function ecouterJeuxFirebase(){
             );
 
             localStorage.setItem(
-                "statistiquesJeux",
+                "stats",
                 JSON.stringify(
-                    statistiquesJeux
+                    stats
                 )
             );
 
@@ -4465,60 +4498,67 @@ scoreMarc > scoreAurore
 : "Égalité";
 
 if(
-    !statistiquesJeux.jeux[jeu].meilleurScore ||
+    !stats.jeux[jeu].meilleurScore ||
     meilleurScorePartie >
-    statistiquesJeux.jeux[jeu].meilleurScore
+    stats.jeux[jeu].meilleurScore
 ){
 
-    statistiquesJeux.jeux[jeu].meilleurScore =
+    stats.jeux[jeu].meilleurScore =
     meilleurScorePartie;
 
-    statistiquesJeux.jeux[jeu].recordman =
+    stats.jeux[jeu].recordman =
     recordman;
 
 }
 
 if(resultat === "Marc"){
 
-statistiquesJeux.global.Marc.victoires++;
-statistiquesJeux.global.Aurore.defaites++;
+stats.global.Marc.victoires++;
+stats.global.Aurore.defaites++;
 
-statistiquesJeux.jeux[jeu].Marc.victoires++;
-statistiquesJeux.jeux[jeu].Aurore.defaites++;
+stats.jeux[jeu].Marc.victoires++;
+stats.jeux[jeu].Aurore.defaites++;
 
 }
 
 else if(resultat === "Aurore"){
 
-statistiquesJeux.global.Aurore.victoires++;
-statistiquesJeux.global.Marc.defaites++;
+stats.global.Aurore.victoires++;
+stats.global.Marc.defaites++;
 
-statistiquesJeux.jeux[jeu].Aurore.victoires++;
-statistiquesJeux.jeux[jeu].Marc.defaites++;
+stats.jeux[jeu].Aurore.victoires++;
+stats.jeux[jeu].Marc.defaites++;
 
 }
 
 else{
 
-statistiquesJeux.global.Marc.nuls++;
-statistiquesJeux.global.Aurore.nuls++;
+stats.global.Marc.nuls++;
+stats.global.Aurore.nuls++;
 
-statistiquesJeux.jeux[jeu].Marc.nuls++;
-statistiquesJeux.jeux[jeu].Aurore.nuls++;
+stats.jeux[jeu].Marc.nuls++;
+stats.jeux[jeu].Aurore.nuls++;
 
 }
 
 historiqueJeux.push({
 
-jeu,
+    jeu,
+    resultat,
+    scoreMarc,
+    scoreAurore,
 
-resultat,
-
-scoreMarc,
-scoreAurore,
-
-date:
-new Date().toLocaleString()
+    date:
+new Date().toLocaleString(
+"fr-FR",
+{
+    day:"2-digit",
+    month:"2-digit",
+    year:"numeric",
+    hour:"2-digit",
+    minute:"2-digit"
+}
+)
 
 });
 
@@ -4528,8 +4568,8 @@ JSON.stringify(historiqueJeux)
 );
 
 localStorage.setItem(
-"statistiquesJeux",
-JSON.stringify(statistiquesJeux)
+"stats",
+JSON.stringify(stats)
 );
 
 envoyerJeuxFirebase();
@@ -4553,16 +4593,16 @@ let html =
 
 <p>
 👨 Marc :
-${statistiquesJeux.global.Marc.victoires} V /
-${statistiquesJeux.global.Marc.defaites} D /
-${statistiquesJeux.global.Marc.nuls} N
+${stats.global.Marc.victoires} V /
+${stats.global.Marc.defaites} D /
+${stats.global.Marc.nuls} N
 </p>
 
 <p>
 👩 Aurore :
-${statistiquesJeux.global.Aurore.victoires} V /
-${statistiquesJeux.global.Aurore.defaites} D /
-${statistiquesJeux.global.Aurore.nuls} N
+${stats.global.Aurore.victoires} V /
+${stats.global.Aurore.defaites} D /
+${stats.global.Aurore.nuls} N
 </p>
 
 <hr>
@@ -4572,7 +4612,7 @@ ${statistiquesJeux.global.Aurore.nuls} N
 </h2>
 `;
 
-for(const jeu in statistiquesJeux.jeux){
+for(const jeu in stats.jeux){
 
 html +=
 
@@ -4583,21 +4623,21 @@ ${jeu}
 
 <p>
 🏅 Record :
-${statistiquesJeux.jeux[jeu].meilleurScore ?? "-"}
+${stats.jeux[jeu].meilleurScore ?? "-"}
  pts
 (
-${statistiquesJeux.jeux[jeu].recordman ?? "-"}
+${stats.jeux[jeu].recordman ?? "-"}
 )
 </p>
 
 <p>
 👨 Marc :
-${statistiquesJeux.jeux[jeu].Marc.victoires} victoire(s)
+${stats.jeux[jeu].Marc.victoires} victoire(s)
 </p>
 
 <p>
 👩 Aurore :
-${statistiquesJeux.jeux[jeu].Aurore.victoires} victoire(s)
+${stats.jeux[jeu].Aurore.victoires} victoire(s)
 </p>
 `;
 }
@@ -4612,17 +4652,334 @@ document.getElementById(
 
 }
 
-function afficherStatistiquesJeux(){
+function convertirDateFr(dateTexte){
+
+    if(!dateTexte){
+        return null;
+    }
+
+    if(dateTexte.includes("T")){
+        return new Date(dateTexte);
+    }
+
+    const morceaux =
+    dateTexte.split(" ");
+
+    if(morceaux.length < 2){
+        return new Date(dateTexte);
+    }
+
+    const [datePartie, heurePartie] =
+    morceaux;
+
+    const [jour, mois, annee] =
+    datePartie.split("/");
+
+    const [heure, minute] =
+    heurePartie.split(":");
+
+    return new Date(
+        Number(annee),
+        Number(mois)-1,
+        Number(jour),
+        Number(heure),
+        Number(minute)
+    );
+
+}
+
+function filtrerPartiesParPeriode(){
+
+    const filtre =
+    document.getElementById(
+        "filtrePeriodeJeux"
+    )?.value || "tout";
+
+    const maintenant =
+    new Date();
+
+    return historiqueJeux.filter(partie=>{
+
+        const datePartie =
+        convertirDateFr(partie.date);
+
+        if(!datePartie){
+            return false;
+        }
+
+        if(filtre === "tout"){
+            return true;
+        }
+
+        if(filtre === "jour"){
+
+            return (
+
+                datePartie.getDate()
+                ===
+                maintenant.getDate()
+
+                &&
+
+                datePartie.getMonth()
+                ===
+                maintenant.getMonth()
+
+                &&
+
+                datePartie.getFullYear()
+                ===
+                maintenant.getFullYear()
+
+            );
+
+        }
+
+        if(filtre === "7j"){
+
+            const limite =
+            new Date();
+
+            limite.setDate(
+                limite.getDate() - 7
+            );
+
+            return datePartie >= limite;
+
+        }
+
+        if(filtre === "30j"){
+
+            const limite =
+            new Date();
+
+            limite.setDate(
+                limite.getDate() - 30
+            );
+
+            return datePartie >= limite;
+
+        }
+
+        if(filtre === "annee"){
+
+            return (
+
+                datePartie.getFullYear()
+                ===
+                maintenant.getFullYear()
+
+            );
+
+        }
+
+        if(filtre === "annee_precedente"){
+
+            return (
+
+                datePartie.getFullYear()
+                ===
+                maintenant.getFullYear() - 1
+
+            );
+
+        }
+
+        if(filtre === "perso"){
+
+            const dateDebut =
+            document.getElementById(
+                "dateDebutJeux"
+            )?.value;
+
+            const dateFin =
+            document.getElementById(
+                "dateFinJeux"
+            )?.value;
+
+            if(!dateDebut || !dateFin){
+                return true;
+            }
+
+            const debut =
+            new Date(dateDebut);
+
+            const fin =
+            new Date(dateFin);
+
+            fin.setHours(
+                23,
+                59,
+                59,
+                999
+            );
+
+            return (
+                datePartie >= debut
+                &&
+                datePartie <= fin
+            );
+
+        }
+
+        return true;
+
+    });
+
+}
+
+
+function afficherstats(){
+
+const filtreActuel =
+document.getElementById(
+    "filtrePeriodeJeux"
+)?.value || "tout";
+
+const dateDebutActuelle =
+document.getElementById(
+    "dateDebutJeux"
+)?.value || "";
+
+const dateFinActuelle =
+document.getElementById(
+    "dateFinJeux"
+)?.value || "";
+
+const partiesFiltrees =
+filtrerPartiesParPeriode();
+
+const stats = {
+
+    global:{
+
+        Marc:{
+            victoires:0,
+            defaites:0,
+            nuls:0
+        },
+
+        Aurore:{
+            victoires:0,
+            defaites:0,
+            nuls:0
+        }
+
+    },
+
+    jeux:{}
+
+};
+
+for(const jeu of jeuxSociete){
+
+    stats.jeux[jeu] = {
+
+        Marc:{
+            victoires:0,
+            defaites:0,
+            nuls:0
+        },
+
+        Aurore:{
+            victoires:0,
+            defaites:0,
+            nuls:0
+        },
+
+        meilleurScore:null,
+        recordman:null
+
+    };
+
+}
+
+partiesFiltrees.forEach(partie=>{
+
+    const jeu = partie.jeu;
+
+    if(partie.resultat === "Marc"){
+
+        stats.global.Marc.victoires++;
+        stats.global.Aurore.defaites++;
+
+        stats.jeux[jeu].Marc.victoires++;
+        stats.jeux[jeu].Aurore.defaites++;
+
+    }
+
+    else if(partie.resultat === "Aurore"){
+
+        stats.global.Aurore.victoires++;
+        stats.global.Marc.defaites++;
+
+        stats.jeux[jeu].Aurore.victoires++;
+        stats.jeux[jeu].Marc.defaites++;
+
+    }
+
+    else{
+
+        stats.global.Marc.nuls++;
+        stats.global.Aurore.nuls++;
+
+        stats.jeux[jeu].Marc.nuls++;
+        stats.jeux[jeu].Aurore.nuls++;
+
+    }
+
+    const meilleur =
+    Math.max(
+        partie.scoreMarc || 0,
+        partie.scoreAurore || 0
+    );
+
+    const recordman =
+    (partie.scoreMarc || 0) >
+    (partie.scoreAurore || 0)
+
+    ? "Marc"
+
+    :
+
+    (partie.scoreAurore || 0) >
+    (partie.scoreMarc || 0)
+
+    ? "Aurore"
+
+    : "Égalité";
+
+    if(
+
+        stats.jeux[jeu].meilleurScore === null
+
+        ||
+
+        meilleur >
+        stats.jeux[jeu].meilleurScore
+
+    ){
+
+        stats.jeux[jeu].meilleurScore =
+        meilleur;
+
+        stats.jeux[jeu].recordman =
+        recordman;
+
+    }
+
+});
+
 
 const totalPartiesGlobales =
-statistiquesJeux.global.Marc.victoires +
-statistiquesJeux.global.Aurore.victoires +
-statistiquesJeux.global.Marc.nuls;
+stats.global.Marc.victoires +
+stats.global.Aurore.victoires +
+stats.global.Marc.nuls;
 
 const pourcentageMarc =
 totalPartiesGlobales > 0
 ? (
-    statistiquesJeux.global.Marc.victoires
+    stats.global.Marc.victoires
     / totalPartiesGlobales * 100
 ).toFixed(1)
 : 0;
@@ -4630,15 +4987,110 @@ totalPartiesGlobales > 0
 const pourcentageAurore =
 totalPartiesGlobales > 0
 ? (
-    statistiquesJeux.global.Aurore.victoires
+    stats.global.Aurore.victoires
     / totalPartiesGlobales * 100
 ).toFixed(1)
 : 0;
 
 let html =
-
 `
 <div class="card">
+
+<h2>
+🏆 Résultats et statistiques
+</h2>
+
+<div style="margin-bottom:15px;">
+
+<label>
+📅 Période
+</label>
+
+<select
+id="filtrePeriodeJeux"
+onchange="afficherstats()">
+
+<option
+value="tout"
+${filtreActuel==="tout"?"selected":""}>
+Toutes les parties
+</option>
+
+<option
+value="jour"
+${filtreActuel==="jour"?"selected":""}>
+Aujourd'hui
+</option>
+
+<option
+value="7j"
+${filtreActuel==="7j"?"selected":""}>
+7 derniers jours
+</option>
+
+<option
+value="30j"
+${filtreActuel==="30j"?"selected":""}>
+30 derniers jours
+</option>
+
+<option
+value="annee"
+${filtreActuel==="annee"?"selected":""}>
+Cette année
+</option>
+
+<option
+value="annee_precedente"
+${filtreActuel==="annee_precedente"?"selected":""}>
+Année précédente
+</option>
+
+<option
+value="perso"
+${filtreActuel==="perso"?"selected":""}>
+Période personnalisée
+</option>
+
+</select>
+
+${
+filtreActuel==="perso"
+?
+
+`
+<br><br>
+
+<label>
+📅 Du
+</label>
+
+<input
+type="date"
+id="dateDebutJeux"
+value="${dateDebutActuelle}"
+onchange="afficherstats()">
+
+<label>
+📅 Au
+</label>
+
+<input
+type="date"
+id="dateFinJeux"
+value="${dateFinActuelle}"
+onchange="afficherstats()">
+`
+
+:
+
+""
+
+}
+
+</div>
+
+<hr>
 
 <h2>
 🏆 Résultats globaux
@@ -4646,19 +5098,19 @@ let html =
 
 <p>
 👨 Marc :
-${statistiquesJeux.global.Marc.victoires} victoire(s)
+${stats.global.Marc.victoires} victoire(s)
 (${pourcentageMarc}%)
 </p>
 
 <p>
 👩 Aurore :
-${statistiquesJeux.global.Aurore.victoires} victoire(s)
+${stats.global.Aurore.victoires} victoire(s)
 (${pourcentageAurore}%)
 </p>
 
 <p>
 🤝 Matchs nuls :
-${statistiquesJeux.global.Marc.nuls}
+${stats.global.Marc.nuls}
 </p>
 
 <hr>
@@ -4672,15 +5124,15 @@ const jeuxTriesStatistiques =
 [...jeuxSociete]
 .sort((a,b)=>{
 
-    const partiesA =
-        historiqueJeux.filter(
-            p => p.jeu === a
-        ).length;
+const partiesA =
+partiesFiltrees.filter(
+    p => p.jeu === a
+).length;
 
-    const partiesB =
-        historiqueJeux.filter(
-            p => p.jeu === b
-        ).length;
+const partiesB =
+partiesFiltrees.filter(
+    p => p.jeu === b
+).length;
 
     return partiesB - partiesA;
 
@@ -4688,21 +5140,21 @@ const jeuxTriesStatistiques =
 
 for(const jeu of jeuxTriesStatistiques){
 
-    const nbParties =
-historiqueJeux.filter(
+   const nbParties =
+partiesFiltrees.filter(
     p => p.jeu === jeu
 ).length;
 
 
     const totalPartiesJeu =
-    statistiquesJeux.jeux[jeu].Marc.victoires +
-    statistiquesJeux.jeux[jeu].Aurore.victoires +
-    statistiquesJeux.jeux[jeu].Marc.nuls;
+    stats.jeux[jeu].Marc.victoires +
+    stats.jeux[jeu].Aurore.victoires +
+    stats.jeux[jeu].Marc.nuls;
 
 const pourcentageMarcJeu =
     totalPartiesJeu > 0
     ? (
-        statistiquesJeux.jeux[jeu].Marc.victoires
+        stats.jeux[jeu].Marc.victoires
         / totalPartiesJeu * 100
     ).toFixed(1)
     : 0;
@@ -4710,7 +5162,7 @@ const pourcentageMarcJeu =
 const pourcentageAuroreJeu =
     totalPartiesJeu > 0
     ? (
-        statistiquesJeux.jeux[jeu].Aurore.victoires
+        stats.jeux[jeu].Aurore.victoires
         / totalPartiesJeu * 100
     ).toFixed(1)
     : 0;
@@ -4725,29 +5177,29 @@ ${jeu}
 
 <p>
 🏅 Meilleur score :
-${statistiquesJeux.jeux[jeu].meilleurScore ?? "-"}
+${stats.jeux[jeu].meilleurScore ?? "-"}
  pts
 (
-${statistiquesJeux.jeux[jeu].recordman ?? "-"}
+${stats.jeux[jeu].recordman ?? "-"}
 )
 </p>
 
 <p>
 
 👨 Marc :
-${statistiquesJeux.jeux[jeu].Marc.victoires}
+${stats.jeux[jeu].Marc.victoires}
  (${pourcentageMarcJeu}%)
 
 |
 
 👩 Aurore :
-${statistiquesJeux.jeux[jeu].Aurore.victoires}
+${stats.jeux[jeu].Aurore.victoires}
  (${pourcentageAuroreJeu}%)
 
 |
 
 🤝
-${statistiquesJeux.jeux[jeu].Marc.nuls}
+${stats.jeux[jeu].Marc.nuls}
 
 </p>
 `;
@@ -4761,37 +5213,163 @@ document.getElementById(
 
 }
 
-function reinitialiserScoresJeux(){
+function afficherHistoriqueJeuxAdmin(){
+
+    let html = `
+    <div class="card">
+
+    <h3>
+    📋 Historique des parties
+    </h3>
+    `;
+
+    if(historiqueJeux.length === 0){
+
+        html += `
+        <p>
+        Aucune partie enregistrée.
+        </p>
+        `;
+
+    }
+
+    historiqueJeux
+    .slice()
+    .reverse()
+    .forEach((partie,index)=>{
+
+        const vraiIndex =
+        historiqueJeux.length - 1 - index;
+
+        const gagnant =
+        partie.resultat === "nul"
+        ? "🤝 Nul"
+        : "🏆 " + partie.resultat;
+
+        html += `
+
+        <details
+        style="
+        margin-bottom:6px;
+        border:1px solid #ddd;
+        border-radius:8px;
+        padding:4px;
+        ">
+
+        <summary
+        style="
+        cursor:pointer;
+        font-size:14px;
+        ">
+
+        📅 ${partie.date}
+        |
+        🎲 ${partie.jeu}
+        |
+        ${gagnant}
+
+        </summary>
+
+        <div
+        style="
+        padding-top:10px;
+        ">
+
+        <p>
+        👨 Marc :
+        <b>${partie.scoreMarc}</b>
+        </p>
+
+        <p>
+        👩 Aurore :
+        <b>${partie.scoreAurore}</b>
+        </p>
+
+        <button
+        class="action"
+        style="
+        background:#dc3545;
+        "
+        onclick="
+        supprimerPartieJeu(
+        ${vraiIndex}
+        )
+        ">
+
+        🗑️ Supprimer
+
+        </button>
+
+        </div>
+
+        </details>
+
+        `;
+
+    });
+
+    html += `
+    </div>
+    `;
+
+    document.getElementById(
+        "adminJeuxZone"
+    ).innerHTML = html;
+
+}
+
+function supprimerPartieJeu(index){
+
+    const partie =
+    historiqueJeux[index];
 
     if(
         !confirm(
-            "Supprimer tous les résultats et statistiques ?"
+            `Supprimer la partie\n\n${partie.jeu}\n${partie.date} ?`
         )
     ){
         return;
     }
 
-    historiqueJeux = [];
+    historiqueJeux.splice(
+        index,
+        1
+    );
 
-    statistiquesJeux = {
+    recalculerstats();
+
+    afficherHistoriqueJeuxAdmin();
+
+    afficherListeJeux();
+
+}
+
+function recalculerstats(){
+
+    stats = {
+
         global:{
             Marc:{
                 victoires:0,
                 defaites:0,
                 nuls:0
             },
+
             Aurore:{
                 victoires:0,
                 defaites:0,
                 nuls:0
             }
+
         },
+
         jeux:{}
+
     };
 
     for(const jeu of jeuxSociete){
 
-        statistiquesJeux.jeux[jeu] = {
+        stats.jeux[jeu] = {
 
             Marc:{
                 victoires:0,
@@ -4812,14 +5390,169 @@ function reinitialiserScoresJeux(){
 
     }
 
+    historiqueJeux.forEach(partie=>{
+
+        const jeu =
+        partie.jeu;
+
+        const scoreMarc =
+        partie.scoreMarc || 0;
+
+        const scoreAurore =
+        partie.scoreAurore || 0;
+
+        const meilleur =
+        Math.max(
+            scoreMarc,
+            scoreAurore
+        );
+
+        const recordman =
+        scoreMarc > scoreAurore
+        ? "Marc"
+        : scoreAurore > scoreMarc
+        ? "Aurore"
+        : "Égalité";
+
+        if(
+            stats.jeux[jeu]
+            .meilleurScore === null
+            ||
+            meilleur >
+            stats.jeux[jeu]
+            .meilleurScore
+        ){
+
+            stats.jeux[jeu]
+            .meilleurScore =
+            meilleur;
+
+            stats.jeux[jeu]
+            .recordman =
+            recordman;
+
+        }
+
+        if(partie.resultat === "Marc"){
+
+            stats.global.Marc.victoires++;
+            stats.global.Aurore.defaites++;
+
+            stats.jeux[jeu].Marc.victoires++;
+            stats.jeux[jeu].Aurore.defaites++;
+
+        }
+        else if(
+            partie.resultat === "Aurore"
+        ){
+
+            stats.global.Aurore.victoires++;
+            stats.global.Marc.defaites++;
+
+            stats.jeux[jeu].Aurore.victoires++;
+            stats.jeux[jeu].Marc.defaites++;
+
+        }
+        else{
+
+            stats.global.Marc.nuls++;
+            stats.global.Aurore.nuls++;
+
+            stats.jeux[jeu].Marc.nuls++;
+            stats.jeux[jeu].Aurore.nuls++;
+
+        }
+
+    });
+
+    localStorage.setItem(
+        "historiqueJeux",
+        JSON.stringify(
+            historiqueJeux
+        )
+    );
+
+    localStorage.setItem(
+        "stats",
+        JSON.stringify(
+            stats
+        )
+    );
+
+    if(
+        typeof envoyerJeuxFirebase
+        === "function"
+    ){
+        envoyerJeuxFirebase();
+    }
+
+}
+
+function reinitialiserScoresJeux(){
+
+    if(
+        !confirm(
+            "Supprimer tous les résultats et statistiques ?"
+        )
+    ){
+        return;
+    }
+
+    historiqueJeux = [];
+
+stats = {
+
+    global:{
+        Marc:{
+            victoires:0,
+            defaites:0,
+            nuls:0
+        },
+
+        Aurore:{
+            victoires:0,
+            defaites:0,
+            nuls:0
+        }
+    },
+
+    jeux:{}
+
+};
+
+for(const jeu of jeuxSociete){
+
+    stats.jeux[jeu] = {
+
+        Marc:{
+            victoires:0,
+            defaites:0,
+            nuls:0
+        },
+
+        Aurore:{
+            victoires:0,
+            defaites:0,
+            nuls:0
+        },
+
+        meilleurScore:null,
+        recordman:null
+
+    };
+
+}
+
+
+
     localStorage.setItem(
         "historiqueJeux",
         JSON.stringify(historiqueJeux)
     );
 
     localStorage.setItem(
-        "statistiquesJeux",
-        JSON.stringify(statistiquesJeux)
+        "stats",
+        JSON.stringify(stats)
     );
 
     envoyerJeuxFirebase();
@@ -4834,11 +5567,13 @@ function reinitialiserScoresJeux(){
 Object.assign(window, {
     ouvrirOnglet,
     ouvrirSuiviJeux,
+    afficherHistoriqueJeuxAdmin,
+    supprimerPartieJeu,
     enregistrerPartieSociete,
     reinitialiserScoresJeux,
     afficherStatistiquesDuel,
     ouvrirJeu,
-    afficherStatistiquesJeux,
+    afficherstats,
     verifierPretADepart,
     verifierPretADepartPartage,
     genererListe,
@@ -4883,9 +5618,12 @@ afficherInventaire();
 afficherFavoris();
 afficherCourses();
 
+function afficherListeJeux(){
+
 let htmlJeux = "";
 
-const jeuxTries = [...jeuxSociete].sort((a,b)=>{
+const jeuxTries =
+[...jeuxSociete].sort((a,b)=>{
 
     const partiesA =
     historiqueJeux.filter(
@@ -4915,21 +5653,20 @@ jeuxTries.forEach(jeu=>{
     onclick="ouvrirJeu('${jeu}')">
 
     ${jeu}
-    <br>
-    <small>
-    ${nbParties} partie(s)
-    </small>
 
     </button>
 
-    `;
+`;
 
 });
 
-
 document.getElementById(
-"listeJeux"
+    "listeJeux"
 ).innerHTML = htmlJeux;
+
+}
+
+afficherListeJeux();
 
 ouvrirOnglet("voyageZone");
 
